@@ -1,0 +1,671 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".RegistroPasajerosActivity">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayout"
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        android:background="#0af3e0"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_editor_absoluteX="-55dp">
+
+
+        <ImageView
+            android:id="@+id/imageViewFotoPasajero"
+            android:layout_width="143dp"
+            android:layout_height="122dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="15dp"
+            android:layout_marginBottom="10dp"
+            app:layout_constraintBottom_toTopOf="@+id/BtnCambiarImagenPasajero"
+            app:layout_constraintEnd_toStartOf="@+id/imageViewFotoMotoConductor"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/TituloRegistrarConductor"
+            app:srcCompat="@drawable/user"
+            tools:srcCompat="@drawable/user" />
+
+        <ImageView
+            android:id="@+id/imageViewFotoMotoConductor"
+            android:layout_width="143dp"
+            android:layout_height="122dp"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginBottom="10dp"
+            app:layout_constraintBottom_toTopOf="@+id/btnCambiarImagenMotoConductor"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/imageViewFotoPasajero"
+            app:layout_constraintTop_toBottomOf="@+id/TituloRegistrarConductor"
+            app:srcCompat="@drawable/scooter"
+            tools:srcCompat="@drawable/scooter" />
+
+        <TextView
+            android:id="@+id/TituloRegistrarConductor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Registro Conductor"
+            android:textColor="#1f1a30"
+            android:textSize="30dp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:layout_editor_absoluteY="5dp" />
+
+
+        <Button
+            android:id="@+id/BtnCambiarImagenPasajero"
+            android:layout_width="110dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="40dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/buttonrounded"
+            android:onClick="onclickCambiarImagenConductor"
+            android:text="Subir Imagen"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/btnCambiarImagenMotoConductor"
+            app:layout_constraintHorizontal_bias="0.182"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/imageViewFotoPasajero" />
+
+        <Button
+            android:id="@+id/btnCambiarImagenMotoConductor"
+            android:layout_width="110dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="60dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="52dp"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/buttonrounded"
+            android:onClick="onclickCambiarImagenMotoConductor"
+            android:text="Subir Imagen"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/BtnCambiarImagenMoto"
+            app:layout_constraintTop_toBottomOf="@+id/imageViewFotoMotoConductor" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <ScrollView
+        android:layout_width="391dp"
+        android:layout_height="577dp"
+        android:layout_marginTop="250dp"
+        android:background="#1f1a30"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_editor_absoluteX="1dp">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/textViewTituloInfoPersonalConductor"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:text="Información personal"
+                android:textColor="@color/white"
+                android:textSize="30dp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <EditText
+                android:id="@+id/editTextNombreConductor"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="10dp"
+                android:backgroundTint="#0af3e0"
+                android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                android:ems="10"
+                android:hint="Nombre"
+                android:inputType="textPersonName"
+                android:paddingLeft="20dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textViewTituloInfoPersonalConductor" />
+
+
+            <EditText
+                android:id="@+id/editTextCedulaConductor"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="10dp"
+                android:backgroundTint="#0af3e0"
+                android:digits="0123456789"
+                android:ems="10"
+                android:hint="Cedula"
+                android:inputType="textPersonName"
+                android:paddingLeft="20dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/editTextNombreConductor" />
+
+            <EditText
+                android:id="@+id/editTextEdadConductor"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="10dp"
+                android:backgroundTint="#0af3e0"
+                android:digits="0123456789"
+                android:ems="10"
+                android:hint="Edad"
+                android:inputType="textPersonName"
+                android:maxLength="2"
+                android:paddingLeft="20dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/spinnerGeneroConductor" />
+
+            <EditText
+                android:id="@+id/editTextNumeroTelefonoConductor"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="10dp"
+                android:backgroundTint="#0af3e0"
+                android:digits="0123456789"
+                android:ems="10"
+                android:hint="Telefono"
+                android:inputType="textPersonName"
+                android:paddingLeft="20dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/editTextEdadConductor" />
+
+
+            <TextView
+                android:id="@+id/textViewTituloInfoMotoConductor"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="Información del Vehiculo"
+                android:textColor="@color/white"
+                android:textSize="30dp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/spinnerLugarLaboral" />
+
+            <EditText
+                android:id="@+id/editTextModeloMoto"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="10dp"
+                android:backgroundTint="#0af3e0"
+                android:digits="0123456789"
+                android:ems="10"
+                android:hint="Modelo"
+                android:inputType="textPersonName"
+                android:maxLength="4"
+                android:paddingLeft="20dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textViewTituloInfoMotoConductor" />
+
+            <EditText
+                android:id="@+id/editTextMarcaMoto"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="10dp"
+                android:backgroundTint="#0af3e0"
+                android:ems="10"
+                android:hint="Marca"
+                android:inputType="textPersonName"
+                android:paddingLeft="20dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/editTextModeloMoto" />
+
+            <EditText
+                android:id="@+id/editTextPlacaMoto"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="10dp"
+                android:backgroundTint="#0af3e0"
+                android:ems="10"
+                android:hint="Placa"
+                android:inputType="textPersonName"
+                android:paddingLeft="20dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/editTextMarcaMoto" />
+
+            <TextView
+                android:id="@+id/textViewPrestacionDeServicio"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="Horario laboral"
+                android:textColor="@color/white"
+                android:textSize="30dp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textViewHorarioLaboral" />
+
+            <TextView
+                android:id="@+id/textViewImplementos"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="Implementos"
+                android:textColor="@color/white"
+                android:textSize="30dp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/spinnerHoraInicialDomingo" />
+
+            <EditText
+                android:id="@+id/editTextImplementos"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="170dp"
+                android:layout_marginBottom="20dp"
+                android:backgroundTint="#0af3e0"
+                android:ems="10"
+                android:hint="Implementos"
+                android:inputType="textPersonName"
+                android:paddingLeft="20dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textViewImplementos"
+                app:layout_constraintVertical_bias="0.0" />
+
+
+            <Button
+                android:id="@+id/BtnCrearCuenta"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="10dp"
+                android:background="@drawable/buttonrounded2"
+                android:onClick="onClickCrearCuentaConductor"
+                android:text="Crear cuenta"
+                android:textColor="#1f1a30"
+                android:textSize="20dp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/editTextImplementos" />
+
+
+            <Button
+                android:id="@+id/BtnCancelar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginBottom="50dp"
+                android:background="@drawable/buttonrounded2"
+                android:onClick="onClickCancelarConductor"
+                android:text="Cancelar"
+                android:textColor="#1f1a30"
+                android:textSize="20dp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/BtnCrearCuenta" />
+
+            <Spinner
+                android:id="@+id/spinnerGeneroConductor"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="10dp"
+                android:background="@drawable/buttonrounded"
+                android:paddingLeft="20dp"
+                android:popupBackground="@drawable/buttonrounded"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/editTextCedulaConductor" />
+
+            <Spinner
+                android:id="@+id/spinnerEstadoCivil"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="10dp"
+                android:background="@drawable/buttonrounded"
+                android:paddingLeft="20dp"
+                android:popupBackground="@drawable/buttonrounded"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/editTextNumeroTelefonoConductor" />
+
+            <Spinner
+                android:id="@+id/spinnerLugarResidencia"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="10dp"
+                android:background="@drawable/buttonrounded"
+                android:paddingLeft="20dp"
+                android:popupBackground="@drawable/buttonrounded"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/spinnerEstadoCivil" />
+
+            <Spinner
+                android:id="@+id/spinnerLugarLaboral"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="10dp"
+                android:background="@drawable/buttonrounded"
+                android:paddingLeft="20dp"
+                android:popupBackground="@drawable/buttonrounded"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/spinnerLugarResidencia" />
+
+            <CheckBox
+                android:id="@+id/checkBoxLunes"
+                android:layout_width="95dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:text="Lunes"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textViewPrestacionDeServicio" />
+
+            <Spinner
+                android:id="@+id/spinnerHoraInicialLunes"
+                android:layout_width="130dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="5dp"
+                android:background="@drawable/buttonrounded"
+                android:popupBackground="@drawable/buttonrounded"
+                app:layout_constraintEnd_toStartOf="@+id/spinnerHoraFinalLunes"
+                app:layout_constraintStart_toEndOf="@+id/checkBoxLunes"
+                app:layout_constraintTop_toBottomOf="@+id/textViewPrestacionDeServicio" />
+
+            <Spinner
+                android:id="@+id/spinnerHoraFinalLunes"
+                android:layout_width="130dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="10dp"
+                android:background="@drawable/buttonrounded"
+                android:popupBackground="@drawable/buttonrounded"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/spinnerHoraInicialLunes"
+                app:layout_constraintTop_toBottomOf="@+id/textViewPrestacionDeServicio" />
+
+
+            <CheckBox
+                android:id="@+id/checkBoxMartes"
+                android:layout_width="95dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:text="Martes"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/checkBoxLunes" />
+
+            <Spinner
+                android:id="@+id/spinnerHoraInicialMartes"
+                android:layout_width="130dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="5dp"
+                android:background="@drawable/buttonrounded"
+                android:popupBackground="@drawable/buttonrounded"
+                app:layout_constraintEnd_toStartOf="@+id/spinnerHoraFinalMartes"
+                app:layout_constraintStart_toEndOf="@+id/checkBoxMartes"
+                app:layout_constraintTop_toBottomOf="@+id/spinnerHoraInicialLunes" />
+
+            <Spinner
+                android:id="@+id/spinnerHoraInicialMiercoles"
+                android:layout_width="130dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="5dp"
+                android:background="@drawable/buttonrounded"
+                android:popupBackground="@drawable/buttonrounded"
+                app:layout_constraintEnd_toStartOf="@+id/spinnerHoraFinalMiercoles"
+                app:layout_constraintStart_toEndOf="@+id/checkBoxMiercoles"
+                app:layout_constraintTop_toBottomOf="@+id/spinnerHoraInicialMartes" />
+
+            <Spinner
+                android:id="@+id/spinnerHoraInicialJueves"
+                android:layout_width="130dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="5dp"
+                android:background="@drawable/buttonrounded"
+                android:popupBackground="@drawable/buttonrounded"
+                app:layout_constraintEnd_toStartOf="@+id/spinnerHoraFinalJueves"
+                app:layout_constraintStart_toEndOf="@+id/checkBoxJueves"
+                app:layout_constraintTop_toBottomOf="@+id/spinnerHoraInicialMiercoles" />
+
+            <Spinner
+                android:id="@+id/spinnerHoraInicialViernes"
+                android:layout_width="130dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="5dp"
+                android:background="@drawable/buttonrounded"
+                android:popupBackground="@drawable/buttonrounded"
+                app:layout_constraintEnd_toStartOf="@+id/spinnerHoraFinalViernes"
+                app:layout_constraintStart_toEndOf="@+id/checkBoxViernes"
+                app:layout_constraintTop_toBottomOf="@+id/spinnerHoraInicialJueves" />
+
+            <Spinner
+                android:id="@+id/spinnerHoraInicialSabado"
+                android:layout_width="130dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="5dp"
+                android:background="@drawable/buttonrounded"
+                android:popupBackground="@drawable/buttonrounded"
+                app:layout_constraintEnd_toStartOf="@+id/spinnerHoraFinalSabado"
+                app:layout_constraintStart_toEndOf="@+id/checkBoxSabado"
+                app:layout_constraintTop_toBottomOf="@+id/spinnerHoraInicialViernes" />
+
+            <Spinner
+                android:id="@+id/spinnerHoraInicialDomingo"
+                android:layout_width="130dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="5dp"
+                android:background="@drawable/buttonrounded"
+                android:popupBackground="@drawable/buttonrounded"
+                app:layout_constraintEnd_toStartOf="@+id/spinnerHoraFinalDomingo"
+                app:layout_constraintStart_toEndOf="@+id/checkBoxDomingo"
+                app:layout_constraintTop_toBottomOf="@+id/spinnerHoraInicialSabado" />
+
+            <Spinner
+                android:id="@+id/spinnerHoraFinalJueves"
+                android:layout_width="130dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="10dp"
+                android:background="@drawable/buttonrounded"
+                android:popupBackground="@drawable/buttonrounded"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/spinnerHoraInicialJueves"
+                app:layout_constraintTop_toBottomOf="@+id/spinnerHoraFinalMiercoles" />
+
+            <Spinner
+                android:id="@+id/spinnerHoraFinalViernes"
+                android:layout_width="130dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="10dp"
+                android:background="@drawable/buttonrounded"
+                android:popupBackground="@drawable/buttonrounded"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/spinnerHoraInicialViernes"
+                app:layout_constraintTop_toBottomOf="@+id/spinnerHoraFinalJueves" />
+
+            <Spinner
+                android:id="@+id/spinnerHoraFinalSabado"
+                android:layout_width="130dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="10dp"
+                android:background="@drawable/buttonrounded"
+                android:popupBackground="@drawable/buttonrounded"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/spinnerHoraInicialSabado"
+                app:layout_constraintTop_toBottomOf="@+id/spinnerHoraFinalViernes" />
+
+            <Spinner
+                android:id="@+id/spinnerHoraFinalDomingo"
+                android:layout_width="130dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="10dp"
+                android:background="@drawable/buttonrounded"
+                android:popupBackground="@drawable/buttonrounded"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/spinnerHoraInicialDomingo"
+                app:layout_constraintTop_toBottomOf="@+id/spinnerHoraFinalSabado" />
+
+            <Spinner
+                android:id="@+id/spinnerHoraFinalMartes"
+                android:layout_width="130dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="10dp"
+                android:background="@drawable/buttonrounded"
+                android:popupBackground="@drawable/buttonrounded"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/spinnerHoraInicialMartes"
+                app:layout_constraintTop_toBottomOf="@+id/spinnerHoraFinalLunes" />
+
+            <Spinner
+                android:id="@+id/spinnerHoraFinalMiercoles"
+                android:layout_width="130dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="10dp"
+                android:background="@drawable/buttonrounded"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/spinnerHoraInicialMiercoles"
+                app:layout_constraintTop_toBottomOf="@+id/spinnerHoraFinalMartes"
+                android:popupBackground="@drawable/buttonrounded" />
+
+            <CheckBox
+                android:id="@+id/checkBoxMiercoles"
+                android:layout_width="95dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:text="Miercoles"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/checkBoxMartes" />
+
+            <CheckBox
+                android:id="@+id/checkBoxJueves"
+                android:layout_width="95dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:text="Jueves"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/checkBoxMiercoles" />
+
+            <CheckBox
+                android:id="@+id/checkBoxViernes"
+                android:layout_width="95dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:text="Viernes"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/checkBoxJueves" />
+
+            <CheckBox
+                android:id="@+id/checkBoxSabado"
+                android:layout_width="95dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:text="Sabado"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/checkBoxViernes" />
+
+            <CheckBox
+                android:id="@+id/checkBoxDomingo"
+                android:layout_width="95dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:text="Domingo"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/checkBoxSabado" />
+
+            <TextView
+                android:id="@+id/textViewHorarioLaboral"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="10dp"
+                android:textColor="@color/white"
+                android:textSize="25dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/editTextPlacaMoto" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

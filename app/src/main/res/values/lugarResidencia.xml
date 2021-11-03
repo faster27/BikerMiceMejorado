@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="combo_lugarResidencia">
+
+        <item>Lugar de residencia</item>
+        <item>Tuluá</item>
+        <item>Andalucia</item>
+        <item>Bugalagrande</item>
+        <item>San Pedro</item>
+        <item>Rio Frio</item>
+
+    </string-array>
+
+
+
+</resources>
