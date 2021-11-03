@@ -8,6 +8,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -20,6 +21,14 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
+
 public class PerfilPasajeroActivity extends AppCompatActivity {
 
     TextView NombreBienvenida;
@@ -27,7 +36,9 @@ public class PerfilPasajeroActivity extends AppCompatActivity {
     Spinner Genero,LugarLaboral;
     EditText Edad,Modelo;
 
-    String cedula,GeneroBusqueda,LaboralBusqueda;
+    String Uid,GeneroBusqueda,LaboralBusqueda;
+    DatabaseReference bd;
+    FirebaseAuth Auth;
 
     protected void  onCreate(Bundle SavedInstanceStatus) {
 
@@ -40,16 +51,18 @@ public class PerfilPasajeroActivity extends AppCompatActivity {
         LugarLaboral = findViewById(R.id.spinnerResidenciaBusqueda);
         Edad=findViewById(R.id.EdadBusquedadConductor);
         Modelo=findViewById(R.id.BusquedaModeloMoto);
+        bd= FirebaseDatabase.getInstance().getReference();
+        Auth=FirebaseAuth.getInstance();
 
         Bundle MiBundle = this.getIntent().getExtras();
 
         if (MiBundle != null) {
 
-            cedula = MiBundle.getString("cedula");
+            Uid = MiBundle.getString("Uid");
 
-            Toast.makeText(getApplicationContext(),"soy cedula pasajero"+cedula,Toast.LENGTH_LONG);
+        //    Toast.makeText(getApplicationContext(),"soy cedula pasajero"+cedula,Toast.LENGTH_LONG);
 
-            CargarDatos(cedula);
+            CargarDatos(Uid);
 
 
 
@@ -99,9 +112,33 @@ public class PerfilPasajeroActivity extends AppCompatActivity {
 
     }
 
-    private void CargarDatos(String cedula) {
+    private void CargarDatos(String Uid) {
 
-       
+
+        bd.child("Users").child(Uid).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                if(snapshot.exists()){
+
+
+
+                    String nombre=snapshot.child("nombre").getValue().toString();
+                    NombreBienvenida.setText(nombre);
+
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+
+
+
 
 
     }
@@ -111,10 +148,9 @@ public class PerfilPasajeroActivity extends AppCompatActivity {
 
         Intent MiIntent = new Intent(getApplicationContext(),RegistroPasajerosActivity.class);
 
-
         Bundle MiBundle=new Bundle();
         MiBundle.putString("bandera","1");
-        MiBundle.putString("cedula",cedula);
+        MiBundle.putString("Uid",Auth.getCurrentUser().getUid());
 
         MiIntent.putExtras(MiBundle);
 
@@ -129,9 +165,13 @@ public class PerfilPasajeroActivity extends AppCompatActivity {
                 "Si", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        Intent MiIntent = new Intent(getApplicationContext(),MainActivity.class);
-                        startActivity(MiIntent);
-                        finish();
+                       Auth.signOut();
+
+                       Intent MiIntent = new Intent(getApplicationContext(),MainActivity.class);
+                       startActivity(MiIntent);
+                       finish();
+
+
                     }
                 }
         ).setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
@@ -170,7 +210,7 @@ public class PerfilPasajeroActivity extends AppCompatActivity {
 
             Bundle MiBundle=new Bundle();
 
-            MiBundle.putString("cedulapasajero",cedula);
+           // MiBundle.putString("cedulapasajero",cedula);
             MiBundle.putString("edad", Edad.getText().toString());
             MiBundle.putString("genero",GeneroBusqueda);
             MiBundle.putString("LugarLaboral",LaboralBusqueda);

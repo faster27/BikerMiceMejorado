@@ -56,7 +56,18 @@ public class MainActivity extends AppCompatActivity {
                public void onComplete(@NonNull Task<AuthResult> task) {
                    if(task.isSuccessful()){
 
-                       Toast.makeText(getApplicationContext(),"Login exitoso",Toast.LENGTH_SHORT).show();
+                       Intent MiIntent = new Intent(getApplicationContext(),PerfilPasajeroActivity.class);
+
+                       Bundle MiBundle=new Bundle();
+                       MiBundle.putString("Uid",Auth.getCurrentUser().getUid());
+
+
+                       MiIntent.putExtras(MiBundle);
+
+                       startActivity(MiIntent);
+                       finish();
+
+                       //Toast.makeText(getApplicationContext(),"Login exitoso",Toast.LENGTH_SHORT).show();
 
 
                    }else{

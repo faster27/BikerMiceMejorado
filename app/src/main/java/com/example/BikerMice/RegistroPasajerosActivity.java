@@ -28,11 +28,16 @@ import android.widget.Toast;
 
 import com.example.BikerMice.utilidades.Utilidades;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
@@ -120,10 +125,10 @@ public class RegistroPasajerosActivity extends AppCompatActivity {
 
         if(MiBundle!=null) {
 
-            String cedula =MiBundle.getString("cedula");
+            String Uid =MiBundle.getString("Uid");
             señal = MiBundle.getString("bandera").toString();
 
-            cargarDatos(cedula);
+            cargarDatos(Uid);
 
         }
 
@@ -131,69 +136,68 @@ public class RegistroPasajerosActivity extends AppCompatActivity {
 
     }
 
-    private void cargarDatos(String cedula) {
+    private void cargarDatos(String Uid) {
+
+        database.child("Users").child(Uid).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.exists()){
+
+                    String email=snapshot.child("email").getValue().toString();
+                    String contrasena=snapshot.child("contrasena").getValue().toString();
+                    String nombre=snapshot.child("nombre").getValue().toString();
+                    String cedula=snapshot.child("cedula").getValue().toString();
+                    String edad=snapshot.child("edad").getValue().toString();
+                    String genero=snapshot.child("genero").getValue().toString();
+                    String residencia=snapshot.child("residencia").getValue().toString();
 
 
-        ConexionSQLiteHelper conn= new ConexionSQLiteHelper(this,"dbBikerMice2",null,1);
-        SQLiteDatabase db = conn.getWritableDatabase();
+                    //SE SETEA EL CAMPO EMAIL
+                    campoEmail.setText(email);
+                    campoEmail.setKeyListener(null);
 
-        String stringQueryPasajero = "Select *  from pasajeros where cedula= "+cedula+"";
-
-        Cursor cursorPasajero = db.rawQuery(stringQueryPasajero,null);
-
-        cursorPasajero.moveToFirst();
-
-        //SE SETEA EL CAMPO CEDULA
-        int columna =cursorPasajero.getColumnIndex("cedula");
-        String documento= cursorPasajero.getString(columna);
-        campoCedula.setText(documento);
-        campoCedula.setKeyListener(null);
-
-        //SE SETA EL CAMPO NOMBRE
-
-        int columna2 =cursorPasajero.getColumnIndex("nombre");
-        String nombre= cursorPasajero.getString(columna2);
-        campoNombre.setText(nombre);
-
-        //SE SETA EL CAMPO EDAD
-
-        int columna3 =cursorPasajero.getColumnIndex("edad");
-        String edad= cursorPasajero.getString(columna3);
-        campoEdad.setText(edad);
-
-        //SE SETEA EL CAMPO GENERO
-
-        int columna4 =cursorPasajero.getColumnIndex("genero");
-        String genero= cursorPasajero.getString(columna4);
-        ComboGenero.setSelection(ObtenerPosicionGenero(ComboGenero,genero));
-
-        //SE SETEA EL CAMPO LUGAR DE RESIDENCIA
-
-        int columna5 =cursorPasajero.getColumnIndex("lugarresidencia");
-        String residencia= cursorPasajero.getString(columna5);
-        ComboLugarResidencia.setSelection(ObtenerPosicionLugarResidencia(ComboLugarResidencia,residencia));
-
-        //SE SETEA EL BOTON CREAR CUENTA
-
-        CrearCuenta.setText("Actualizar perfil");
-
-        //SE SETA EL TITULO DE LA VENTA
-
-        TituloVentana.setText("Editar perfil");
-
-        //SE SETA LA FOTO
+                    //SE SETEA EL CAMPO CONTRASEÑA
+                    campoPassword.setText(contrasena);
 
 
-        int columna7 =cursorPasajero.getColumnIndex("fotopasajero");
+                    //SE SETEA EL CAMPO CEDULA
+                    campoCedula.setText(cedula);
+                    campoCedula.setKeyListener(null);
 
-        byte[] Imagen = cursorPasajero.getBlob(columna7);
+                    //SE SETA EL CAMPO NOMBRE
+                    campoNombre.setText(nombre);
 
-        Bitmap bitmapImage = BitmapFactory.decodeByteArray(Imagen,0,Imagen.length);
+                    //SE SETA EL CAMPO EDAD
+                    campoEdad.setText(edad);
 
-        ImagenPasajero.setImageBitmap(bitmapImage);
+                    //SE SETEA EL CAMPO GENERO
+                    ComboGenero.setSelection(ObtenerPosicionGenero(ComboGenero,genero));
 
-        cursorPasajero.close();
-        db.close();
+                    //SE SETEA EL CAMPO LUGAR DE RESIDENCIA
+                    ComboLugarResidencia.setSelection(ObtenerPosicionLugarResidencia(ComboLugarResidencia,residencia));
+
+                    //SE SETEA EL BOTON CREAR CUENTA
+
+                    CrearCuenta.setText("Actualizar perfil");
+
+                    //SE SETA EL TITULO DE LA VENTA
+
+                    TituloVentana.setText("Editar perfil");
+
+
+
+
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+
 
 
     }
@@ -241,52 +245,86 @@ public class RegistroPasajerosActivity extends AppCompatActivity {
 
         String bandera="1";
 
-
         if (bandera.equals(señal)){
-
-
             ActualizarPerfil();
-            Intent MyIntent = new Intent(getApplicationContext(),MainActivity.class);
-            startActivity(MyIntent);
-            finish();
-
-
-
         }else{
-
             RegistrarUsuarios();
-
-
         }
-
-
-
-
-
-
 
     }
 
     private void ActualizarPerfil() {
 
-        ConexionSQLiteHelper conn=new ConexionSQLiteHelper(this,"dbBikerMice2",null,1);
+        String genero = "Genero";
+        String residencia="Lugar de residencia";
 
-        SQLiteDatabase db= conn.getWritableDatabase();
 
-        ContentValues values=new ContentValues();
 
-         byte[] fotoPasajero=CrearBit();
-         String[] parametro = {campoCedula.getText().toString()};
+        if(
+                !campoNombre.getText().toString().isEmpty() &&
+                !campoEdad.getText().toString().isEmpty() &&
+                !campoPassword.getText().toString().isEmpty() &&
+                !GeneroPasajero.equals(genero) &&
+                !LugarResidencia.equals(residencia)
 
-        values.put(Utilidades.CAMPO_NOMBRE_PASAJERO,campoNombre.getText().toString());
-        values.put(Utilidades.CAMPO_GENERO_PASAJERO,GeneroPasajero);
-        values.put(Utilidades.CAMPO_EDAD_PASAJERO,campoEdad.getText().toString());
-        values.put(Utilidades.CAMPO_LUGARRESIDENCIA_PASAJERO,LugarResidencia);
-        values.put(Utilidades.CAMPO_FOTO,fotoPasajero);
+        ){
 
-        db.update(Utilidades.TABLA_PASAJEROS,values,Utilidades.CAMPO_CEDULA_PASAJERO+="=?",parametro);
-        Toast.makeText(getApplicationContext(),"se actualizo correctamente ",Toast.LENGTH_LONG).show();
-        db.close();
+            if(campoPassword.getText().toString().length()>=6){
+
+                Map<String,Object> UsuarioMap = new HashMap<>();
+
+                UsuarioMap.put("email",campoEmail.getText().toString());
+                UsuarioMap.put("contrasena",campoPassword.getText().toString());
+                UsuarioMap.put("nombre",campoNombre.getText().toString());
+                UsuarioMap.put("cedula",campoCedula.getText().toString());
+                UsuarioMap.put("genero",GeneroPasajero);
+                UsuarioMap.put("residencia",LugarResidencia);
+
+                database.child("Users").child(Auth.getCurrentUser().getUid().toString()).updateChildren(UsuarioMap).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void unused) {
+
+                        Toast.makeText(getApplicationContext(), "Usuario Actualizado con exito", Toast.LENGTH_SHORT).show();
+
+                        Intent MiIntent = new Intent(getApplicationContext(),PerfilPasajeroActivity.class);
+
+                        Bundle MiBundle=new Bundle();
+                        MiBundle.putString("Uid",Auth.getCurrentUser().getUid());
+
+                        MiIntent.putExtras(MiBundle);
+
+                        startActivity(MiIntent);
+                        finish();
+
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+
+                        Toast.makeText(getApplicationContext(), "Actualizacion fallida", Toast.LENGTH_SHORT).show();
+
+
+                    }
+                });
+
+
+
+
+
+
+
+
+
+            }else {
+
+                Toast.makeText(getApplicationContext(), "La contraseña debe tener al menos 6 caracteres", Toast.LENGTH_SHORT).show();
+
+            }
+
+
+
+
+        }
 
 
     }
