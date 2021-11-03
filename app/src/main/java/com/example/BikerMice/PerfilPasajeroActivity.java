@@ -101,37 +101,7 @@ public class PerfilPasajeroActivity extends AppCompatActivity {
 
     private void CargarDatos(String cedula) {
 
-        ConexionSQLiteHelper conn= new ConexionSQLiteHelper(this,"dbBikerMice2",null,1);
-        SQLiteDatabase db = conn.getWritableDatabase();
-
-        String stringQueryPasajero = "Select nombre, fotopasajero from pasajeros where cedula= "+cedula+"";
-
-        Cursor cursorPasajero = db.rawQuery(stringQueryPasajero,null);
-
-        if (cursorPasajero!=null && cursorPasajero.moveToFirst()){
-
-            cursorPasajero.moveToFirst();
-
-            int columna =cursorPasajero.getColumnIndex("nombre");
-
-            String nombre= cursorPasajero.getString(columna);
-
-            NombreBienvenida.setText(nombre);
-
-            int columna2 =cursorPasajero.getColumnIndex("fotopasajero");
-
-            byte[] Imagen = cursorPasajero.getBlob(columna2);
-
-
-            Bitmap bitmapImage = BitmapFactory.decodeByteArray(Imagen,0,Imagen.length);
-
-            FotoPasajero.setImageBitmap(bitmapImage);
-
-        }
-
-
-        cursorPasajero.close();
-        db.close();
+       
 
 
     }

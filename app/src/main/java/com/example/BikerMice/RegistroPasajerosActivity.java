@@ -12,6 +12,8 @@ import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import android.view.View;
@@ -25,12 +27,20 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.BikerMice.utilidades.Utilidades;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.io.ByteArrayOutputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 public class RegistroPasajerosActivity extends AppCompatActivity {
 
-    EditText campoCedula,campoNombre,campoEdad;
+    EditText campoCedula,campoNombre,campoEdad,campoEmail,campoPassword;
     Spinner ComboGenero,ComboLugarResidencia;
     String GeneroPasajero,LugarResidencia;
     ImageView ImagenPasajero;
@@ -38,6 +48,8 @@ public class RegistroPasajerosActivity extends AppCompatActivity {
     TextView TituloVentana;
     String señal;
     Bundle MiBundle;
+    FirebaseAuth Auth;
+    DatabaseReference database;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +64,10 @@ public class RegistroPasajerosActivity extends AppCompatActivity {
         ImagenPasajero = findViewById(R.id.imageViewFotoPasajero);
         CrearCuenta =findViewById(R.id.BtnCrearCuenta);
         TituloVentana=findViewById(R.id.TituloRegistrarConductor);
+        campoEmail=findViewById(R.id.textViewCorreoPasajero);
+        campoPassword=findViewById(R.id.textViewPasswordPasajero);
+        Auth=FirebaseAuth.getInstance();
+        database = FirebaseDatabase.getInstance().getReference();
 
 
          MiBundle = this.getIntent().getExtras();
@@ -240,9 +256,6 @@ public class RegistroPasajerosActivity extends AppCompatActivity {
 
             RegistrarUsuarios();
 
-            Intent MyIntent = new Intent(getApplicationContext(),MainActivity.class);
-            startActivity(MyIntent);
-            finish();
 
         }
 
@@ -281,26 +294,91 @@ public class RegistroPasajerosActivity extends AppCompatActivity {
 
     private void RegistrarUsuarios() {
 
-        ConexionSQLiteHelper conn=new ConexionSQLiteHelper(this,"dbBikerMice2",null,1);
+        String genero = "Genero";
+        String residencia="Lugar de residencia";
 
-        SQLiteDatabase db= conn.getWritableDatabase();
+        if(!campoCedula.getText().toString().isEmpty() &&
+            !campoNombre.getText().toString().isEmpty() &&
+            !campoEdad.getText().toString().isEmpty() &&
+            !campoEmail.getText().toString().isEmpty() &&
+            !campoPassword.getText().toString().isEmpty() &&
+                !GeneroPasajero.equals(genero) &&
+                !LugarResidencia.equals(residencia)
 
-        ContentValues values=new ContentValues();
-
-        byte[] fotoPasajero=CrearBit();
-
-        values.put(Utilidades.CAMPO_CEDULA_PASAJERO,campoCedula.getText().toString());
-        values.put(Utilidades.CAMPO_NOMBRE_PASAJERO,campoNombre.getText().toString());
-        values.put(Utilidades.CAMPO_GENERO_PASAJERO,GeneroPasajero);
-        values.put(Utilidades.CAMPO_EDAD_PASAJERO,campoEdad.getText().toString());
-        values.put(Utilidades.CAMPO_LUGARRESIDENCIA_PASAJERO,LugarResidencia);
-        values.put(Utilidades.CAMPO_FOTO,fotoPasajero);
+            )  {
 
 
 
-        Toast.makeText(getApplicationContext(),"registro exitoso",Toast.LENGTH_LONG).show();
+            if(campoPassword.getText().toString().length()>=6){
 
-        db.close();
+                Auth.createUserWithEmailAndPassword(campoEmail.getText().toString(),campoPassword.getText().toString()).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+
+                        if(task.isSuccessful()){
+
+
+                            Map<String,Object> map =new HashMap<>();
+
+                            map.put("email",campoEmail.getText().toString());
+                            map.put("contrasena",campoPassword.getText().toString());
+                            map.put("nombre",campoNombre.getText().toString());
+                            map.put("cedula",campoCedula.getText().toString());
+                            map.put("edad",campoEdad.getText().toString());
+                            map.put("genero",GeneroPasajero);
+                            map.put("residencia",LugarResidencia);
+
+
+                            String id = Auth.getCurrentUser().getUid();
+
+                            database.child("Users").child(id).setValue(map).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task2) {
+                                    if(task2.isSuccessful()){
+
+                                        Toast.makeText(getApplicationContext(), "Usuario registrado con exito", Toast.LENGTH_SHORT).show();
+
+                                        Intent MyIntent = new Intent(getApplicationContext(),MainActivity.class);
+                                        startActivity(MyIntent);
+                                        finish();
+
+
+
+                                    }else{
+
+                                        Toast.makeText(getApplicationContext(), "Registro fallido", Toast.LENGTH_SHORT).show();
+
+                                    }
+                                }
+                            });
+
+
+                        }else{
+
+                            Toast.makeText(getApplicationContext(), "No se pudo registar el usuario", Toast.LENGTH_SHORT).show();
+
+                        }
+
+
+
+
+                                }
+                            });
+
+                        }else {
+
+                Toast.makeText(getApplicationContext(), "La contraseña debe tener al menos 6 caracteres", Toast.LENGTH_SHORT).show();
+
+            }
+
+    }else{
+
+            Toast.makeText(getApplicationContext(), "rellene todos los campos", Toast.LENGTH_SHORT).show();
+
+
+
+        }
+
 
 
 

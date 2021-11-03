@@ -1,41 +1,33 @@
 {
   "project_info": {
-    "project_number": "769472737414",
-    "project_id": "bikermice-2f603",
-    "storage_bucket": "bikermice-2f603.appspot.com"
+    "project_number": "446302091698",
+    "project_id": "bikermice-5a9b7",
+    "storage_bucket": "bikermice-5a9b7.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:769472737414:android:76090e055db7738c79e107",
+        "mobilesdk_app_id": "1:446302091698:android:f852e0b702710251ca4cab",
         "android_client_info": {
-          "package_name": "com.example.bikermice"
+          "package_name": "com.example.BikerMice"
         }
       },
       "oauth_client": [
         {
-          "client_id": "769472737414-814b2rcjc9i66dvq9ud6e4tve5jvahsl.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.example.bikermice",
-            "certificate_hash": "b969f05b284cdc7d305ec8b5723a39872d01dbec"
-          }
-        },
-        {
-          "client_id": "769472737414-ejimj1u5alqcu5bio56n08mghkhtqlnc.apps.googleusercontent.com",
+          "client_id": "446302091698-7fg5i8q4895c13pf3efetqf9bdumbfof.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyDThDUbsLPsTejzTOSjprl5KOq4R3Bp9kw"
+          "current_key": "AIzaSyB5sgmpsFgfGihCkXCH2-J_YKpTzHqeW_E"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "769472737414-ejimj1u5alqcu5bio56n08mghkhtqlnc.apps.googleusercontent.com",
+              "client_id": "446302091698-7fg5i8q4895c13pf3efetqf9bdumbfof.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
