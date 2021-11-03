@@ -11,6 +11,8 @@ import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import android.view.View;
@@ -25,14 +27,25 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.BikerMice.utilidades.Utilidades;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.io.ByteArrayOutputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 public class RegistroConductorActivity extends AppCompatActivity {
 
     EditText campoCedula,campoNombre,campoEdad,campotelefono;
     EditText campoImplementos;
     String DiasLaborales="",señal;
+
+    EditText campoEmail;
+    EditText campoPassword;
 
     EditText campoMarca,campoPlaca,campoModelo;
 
@@ -50,6 +63,9 @@ public class RegistroConductorActivity extends AppCompatActivity {
 
     TextView titulo,campoDiasLaborales;
     Button BtnActualizarPerfil;
+
+    FirebaseAuth Auth;
+    DatabaseReference database;
 
 
 
@@ -72,6 +88,13 @@ public class RegistroConductorActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceStatus){
         super.onCreate(savedInstanceStatus);
         setContentView(R.layout.registro_conductor_activity);
+
+
+        //Variables para la base de datos
+
+        Auth=FirebaseAuth.getInstance();
+        database = FirebaseDatabase.getInstance().getReference();
+
 
 
         imagenConductor= (ImageView) findViewById(R.id.imageViewFotoPasajero);
@@ -101,6 +124,9 @@ public class RegistroConductorActivity extends AppCompatActivity {
         campoImplementos = findViewById(R.id.editTextImplementos);
         ComboGenero=findViewById(R.id.spinnerGeneroConductor);
         imagenConductor =findViewById(R.id.imageViewFotoPasajero);
+        campoEmail=findViewById(R.id.editTextEmailConductor);
+        campoPassword=findViewById(R.id.editTextPasswordConductor);
+
 
 
         Lunes = (CheckBox) findViewById(R.id.checkBoxLunes);
@@ -749,8 +775,6 @@ public class RegistroConductorActivity extends AppCompatActivity {
 
         String bandera="1";
 
-
-
         if(bandera.equals(señal)){
 
 
@@ -765,8 +789,7 @@ public class RegistroConductorActivity extends AppCompatActivity {
 
             RegistrarConductor();
 
-            Intent MyIntent = new Intent(getApplicationContext(),MainActivity.class);
-            startActivity(MyIntent);
+
 
         }
 
@@ -906,52 +929,119 @@ public class RegistroConductorActivity extends AppCompatActivity {
 
     private void RegistrarConductor() {
 
-        ConexionSQLiteHelper conn = new ConexionSQLiteHelper(this,"dbBikerMice2",null,1);
-
-        SQLiteDatabase db = conn.getWritableDatabase();
-
-        ContentValues values = new ContentValues();
-        ContentValues values2 = new ContentValues();
-
-        byte[] fotoConductor=CrearBit(1);
-        byte[] fotoMoto=CrearBit(2);
-
+        String genero = "Genero";
+        String residencia="Lugar de residencia";
+        String civil="Estado civil";
+        String laboral="Lugar laboral";
         String DiasLaborales2 = SacarDias();
 
-        //ESTO VA PARA LA TABLA CONDUCTOR
-
-        values.put(Utilidades.CAMPO_CEDULA,campoCedula.getText().toString());
-        values.put(Utilidades.CAMPO_NOMBRE,campoNombre.getText().toString());
-        values.put(Utilidades.CAMPO_GENERO,generoConductor);
-        values.put(Utilidades.CAMPO_EDAD,campoEdad.getText().toString());
-        values.put(Utilidades.CAMPO_TELEFONO,campotelefono.getText().toString());
-        values.put(Utilidades.CAMPO_LUGARRESIDENCIA,LugarResidencia);
-        values.put(Utilidades.CAMPO_LUGARLABORAL,LugarLaboral);
-        values.put(Utilidades.CAMPO_ESTADOCIVIL,EstadoCivil);
-        values.put(Utilidades.CAMPO_IMPLEMENTOS,campoImplementos.getText().toString());
-        values.put(Utilidades.CAMPO_DIASLABORALES,DiasLaborales2);
-        values.put(Utilidades.CAMPO_FOTO_CONDUCTOR,fotoConductor);
-
-        //ESTO VA PARA LA TABLA MOTO
-
-        values2.put(Utilidades.CAMPO_MARCAMOTO,campoMarca.getText().toString());
-        values2.put(Utilidades.CAMPO_MODELO,campoModelo.getText().toString());
-        values2.put(Utilidades.CAMPO_PLACA,campoPlaca.getText().toString());
-        values2.put(Utilidades.CAMPO_FOTOMOTO,fotoMoto);
+        if(!campoCedula.getText().toString().isEmpty() &&
+                !campoNombre.getText().toString().isEmpty() &&
+                !campoEdad.getText().toString().isEmpty() &&
+                !campoEmail.getText().toString().isEmpty() &&
+                !campoPassword.getText().toString().isEmpty() &&
+                !generoConductor.equals(genero) &&
+                !LugarResidencia.equals(residencia) &&
+                !EstadoCivil.equals(civil) &&
+                !campotelefono.getText().toString().isEmpty() &&
+                !LugarLaboral.equals(laboral) &&
+                !campoMarca.getText().toString().isEmpty() &&
+                !campoModelo.getText().toString().isEmpty() &&
+                !campoPlaca.getText().toString().isEmpty() &&
+                !DiasLaborales2.equals("")
 
 
-        //ME INSERTA EN LA DB
-        db.insert(Utilidades.TABLA_CONDUCTORES,Utilidades.CAMPO_ID_CONDUCTOR,values);
-        db.insert(Utilidades.TABLA_MOTOS,Utilidades.CAMPO_ID_MOTO,values2);
+        ){
+            if(campoPassword.getText().toString().length()>=6) {
 
-        Toast.makeText(getApplicationContext(),"Registro exitoso",Toast.LENGTH_LONG).show();
+                Auth.createUserWithEmailAndPassword(campoEmail.getText().toString(),campoPassword.getText().toString()).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
 
-        db.close();
+                        if(task.isSuccessful()){
+
+                            Map<String,Object> map =new HashMap<>();
+
+                            map.put("email",campoEmail.getText().toString());
+                            map.put("contrasena",campoPassword.getText().toString());
+                            map.put("nombre",campoNombre.getText().toString());
+                            map.put("genero",generoConductor);
+                            map.put("edad",campoEdad.getText().toString());
+                            map.put("telefono",campotelefono.getText().toString());
+                            map.put("estadocivil",EstadoCivil);
+                            map.put("residencia",LugarResidencia);
+                            map.put("laboral",LugarLaboral);
+                            map.put("modelo",campoModelo.getText().toString());
+                            map.put("marca",campoMarca.getText().toString());
+                            map.put("placa",campoPlaca.getText().toString());
+                            map.put("diaslaborales",DiasLaborales2) ;
+
+                            String id = Auth.getCurrentUser().getUid();
+
+                            database.child("Conductores").child(id).setValue(map).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task2) {
+
+                                    if(task2.isSuccessful()){
+
+                                        Toast.makeText(getApplicationContext(), "Usuario registrado con exito", Toast.LENGTH_SHORT).show();
+
+                                        Intent MyIntent = new Intent(getApplicationContext(),MainActivity.class);
+                                        startActivity(MyIntent);
+                                        finish();
+
+
+                                    }else{
+
+                                        Toast.makeText(getApplicationContext(), "Registro fallido", Toast.LENGTH_SHORT).show();
+
+
+                                    }
+
+
+
+                                }
+                            });
+
+                        }else{
+
+                            Toast.makeText(getApplicationContext(), "No se pudo registar el usuario", Toast.LENGTH_SHORT).show();
+
+                        }
+
+                    }
+                });
+
+
+            }else{
+
+                Toast.makeText(getApplicationContext(), "La contraseña debe tener al menos 6 caracteres", Toast.LENGTH_SHORT).show();
+
+            }
 
 
 
 
-    }
+
+        }else {
+
+
+            Toast.makeText(getApplicationContext(), "rellene todos los campos", Toast.LENGTH_SHORT).show();
+
+
+        }
+
+
+
+
+}
+
+
+
+
+
+
+
 
     private byte[] CrearBit(int señal) {
 
