@@ -1,4 +1,4 @@
-package com.example.bikermice;
+package com.example.BikerMice;
 
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import androidx.core.view.MotionEventCompat;
+
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 

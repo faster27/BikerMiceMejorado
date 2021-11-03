@@ -1,4 +1,4 @@
-package com.example.bikermice;
+package com.example.BikerMice;
 
 import android.content.Intent;
 import android.os.Handler;

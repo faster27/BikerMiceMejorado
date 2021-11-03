@@ -1,4 +1,4 @@
-package com.example.bikermice.utilidades;
+package com.example.BikerMice.utilidades;
 
 public class Utilidades {
 

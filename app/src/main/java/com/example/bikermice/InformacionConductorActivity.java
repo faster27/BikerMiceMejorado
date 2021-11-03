@@ -1,4 +1,4 @@
-package com.example.bikermice;
+package com.example.BikerMice;
 
 import android.content.Intent;
 import android.database.Cursor;
@@ -8,7 +8,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ListView;
 
-import com.example.bikermice.utilidades.Utilidades;
+import com.example.BikerMice.utilidades.Utilidades;
 
 import java.util.ArrayList;
 

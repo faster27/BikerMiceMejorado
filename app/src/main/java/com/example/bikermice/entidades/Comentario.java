@@ -1,4 +1,4 @@
-package com.example.bikermice.entidades;
+package com.example.BikerMice.entidades;
 
 public class Comentario {
 

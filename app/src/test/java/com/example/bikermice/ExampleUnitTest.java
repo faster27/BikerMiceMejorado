@@ -1,4 +1,4 @@
-package com.example.bikermice;
+package com.example.BikerMice;
 
 import org.junit.Test;
 

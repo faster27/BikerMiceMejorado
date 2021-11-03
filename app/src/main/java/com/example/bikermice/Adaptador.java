@@ -1,15 +1,13 @@
-package com.example.bikermice;
+package com.example.BikerMice;
 
 import android.content.Context;
-import android.text.Layout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import com.example.bikermice.R;
-import com.example.bikermice.entidades.Conductor;
+import com.example.BikerMice.R;
 
 import java.util.ArrayList;
 

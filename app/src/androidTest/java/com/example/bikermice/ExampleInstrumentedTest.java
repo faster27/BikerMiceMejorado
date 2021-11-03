@@ -1,4 +1,4 @@
-package com.example.bikermice;
+package com.example.BikerMice;
 
 import android.content.Context;
 import androidx.test.platform.app.InstrumentationRegistry;

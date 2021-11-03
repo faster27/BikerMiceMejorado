@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.bikermice">
+    package="com.example.BikerMice">
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
@@ -13,13 +13,13 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.NoActionBar">
         <activity
-            android:name=".InformacionConductorActivity"
+            android:name="com.example.BikerMice.InformacionConductorActivity"
             android:exported="true" />
         <activity
-            android:name=".ResultadoBusquedaActivity"
+            android:name="com.example.BikerMice.ResultadoBusquedaActivity"
             android:exported="true" />
         <activity
-            android:name=".SplashActivity"
+            android:name="com.example.BikerMice.SplashActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -28,13 +28,13 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".MainActivity"
+            android:name="com.example.BikerMice.MainActivity"
             android:exported="true" />
-        <activity android:name=".SeleccionRegistroActivity" />
-        <activity android:name=".RegistroPasajerosActivity" />
-        <activity android:name=".RegistroConductorActivity" />
-        <activity android:name=".PerfilConductorActivity" />
-        <activity android:name=".PerfilPasajeroActivity" />
+        <activity android:name="com.example.BikerMice.SeleccionRegistroActivity" />
+        <activity android:name="com.example.BikerMice.RegistroPasajerosActivity" />
+        <activity android:name="com.example.BikerMice.RegistroConductorActivity" />
+        <activity android:name="com.example.BikerMice.PerfilConductorActivity" />
+        <activity android:name="com.example.BikerMice.PerfilPasajeroActivity" />
 
     </application>
 

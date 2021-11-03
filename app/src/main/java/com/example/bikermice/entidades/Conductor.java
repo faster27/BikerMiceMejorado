@@ -1,6 +1,4 @@
-package com.example.bikermice.entidades;
-
-import java.util.ArrayList;
+package com.example.BikerMice.entidades;
 
 public class Conductor {
 

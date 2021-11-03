@@ -1,4 +1,4 @@
-package com.example.bikermice;
+package com.example.BikerMice;
 
 import android.content.ContentValues;
 import android.content.Intent;
@@ -24,7 +24,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.bikermice.utilidades.Utilidades;
+import com.example.BikerMice.utilidades.Utilidades;
 
 import java.io.ByteArrayOutputStream;
 
