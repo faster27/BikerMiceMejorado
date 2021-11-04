@@ -13,12 +13,18 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class MainActivity extends AppCompatActivity {
 
 
     EditText correo,contrasena;
     FirebaseAuth Auth;
+    DatabaseReference db;
 
     protected void  onCreate(Bundle SavedInstanceStatus){
 
@@ -28,8 +34,7 @@ public class MainActivity extends AppCompatActivity {
         correo=findViewById(R.id.editTextEmail);
         contrasena=findViewById(R.id.editTextTextPassword);
         Auth=FirebaseAuth.getInstance();
-        ConexionSQLiteHelper conn= new ConexionSQLiteHelper(this,"dbBikerMice2",null,1);
-        conn.getWritableDatabase();
+        db=FirebaseDatabase.getInstance().getReference();
 
 
 
@@ -56,23 +61,58 @@ public class MainActivity extends AppCompatActivity {
                public void onComplete(@NonNull Task<AuthResult> task) {
                    if(task.isSuccessful()){
 
-                       Intent MiIntent = new Intent(getApplicationContext(),PerfilPasajeroActivity.class);
 
-                       Bundle MiBundle=new Bundle();
-                       MiBundle.putString("Uid",Auth.getCurrentUser().getUid());
+                       db.child("Users").child(Auth.getCurrentUser().getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+                           @Override
+                           public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                               if(snapshot.exists()){
+
+                                   Intent MiIntent = new Intent(getApplicationContext(),PerfilPasajeroActivity.class);
+
+                                   Bundle MiBundle=new Bundle();
+                                   MiBundle.putString("Uid",Auth.getCurrentUser().getUid());
 
 
-                       MiIntent.putExtras(MiBundle);
+                                   MiIntent.putExtras(MiBundle);
 
-                       startActivity(MiIntent);
-                       finish();
+                                   startActivity(MiIntent);
+                                   finish();
+
+                               }else{
+
+                                   Intent MiIntent = new Intent(getApplicationContext(),PerfilConductorActivity.class);
+
+                                   Bundle MiBundle=new Bundle();
+                                   MiBundle.putString("Uid",Auth.getCurrentUser().getUid());
+                                   MiBundle.putString("señal","2");
+
+
+                                   MiIntent.putExtras(MiBundle);
+
+                                   startActivity(MiIntent);
+                                   finish();
+
+
+                               }
+
+
+                           }
+
+                           @Override
+                           public void onCancelled(@NonNull DatabaseError error) {
+
+                           }
+                       });
+
+
 
                        //Toast.makeText(getApplicationContext(),"Login exitoso",Toast.LENGTH_SHORT).show();
 
 
                    }else{
 
-                       Toast.makeText(getApplicationContext(),"Login fallido",Toast.LENGTH_SHORT).show();
+                       Toast.makeText(getApplicationContext(),"Usuario o contraseña incorrectos",Toast.LENGTH_SHORT).show();
 
 
 

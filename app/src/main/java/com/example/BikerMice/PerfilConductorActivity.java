@@ -9,6 +9,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import android.view.View;
@@ -21,6 +23,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.BikerMice.utilidades.Utilidades;
+import com.google.firebase.analytics.FirebaseAnalytics;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -43,12 +52,15 @@ public class PerfilConductorActivity extends AppCompatActivity {
     ArrayList<String> listaInformacion;
     float Rating;
 
+    FirebaseAuth Auth;
+    DatabaseReference db;
+
     protected void  onCreate(Bundle SavedInstanceStatus){
 
         super.onCreate(SavedInstanceStatus);
         setContentView(R.layout.perfil_conductor);
 
-        conn = new ConexionSQLiteHelper(getApplicationContext(),"dbBikerMice2",null,1);
+
 
         NombreConductor=findViewById(R.id.textViewNombreConductor);
         TituloBienvenida=findViewById(R.id.textViewBienvenida);
@@ -64,11 +76,14 @@ public class PerfilConductorActivity extends AppCompatActivity {
         BarraCalificacion=findViewById(R.id.ratingBarCalificacion);
         Calificacion=findViewById(R.id.textViewPuntuacion);
 
+        Auth = FirebaseAuth.getInstance();
+        db=FirebaseDatabase.getInstance().getReference();
+
 
         BundleRegreso=this.getIntent().getExtras();
         Bundle MiBundle = this.getIntent().getExtras();
-        String seña ="1";
-        cedulaConductor =MiBundle.getString("cedula");
+
+
         señal =MiBundle.getString("señal");
 
 
@@ -77,8 +92,8 @@ public class PerfilConductorActivity extends AppCompatActivity {
             @Override
             public void onRatingChanged(RatingBar ratingBar, float rating, boolean b) {
 
-                Calificar(cedulaConductor,rating);
-                SetearPuntaje(cedulaConductor);
+              //  Calificar(cedulaConductor,rating);
+               // SetearPuntaje(cedulaConductor);
 
             }
         });
@@ -86,10 +101,10 @@ public class PerfilConductorActivity extends AppCompatActivity {
 
 
 
-        CargarDatos(cedulaConductor,señal);
+       CargarDatos(Auth.getCurrentUser().getUid(),señal);
 
 
-        ListaComentario.setAdapter(new Adaptador(this,listaInformacion));
+       // ListaComentario.setAdapter(new Adaptador(this,listaInformacion));
 
 
     }
@@ -154,35 +169,22 @@ public class PerfilConductorActivity extends AppCompatActivity {
 
     }
 
-    private void CargarDatos(String cedula,String señal) {
+    private void CargarDatos(String Uid,String señal) {
 
         String comparacion="1";
         String comparacion2="2";
 
-        SQLiteDatabase db = conn.getReadableDatabase();
 
-        String ConsultaSQL = "select * from " + Utilidades.TABLA_CONDUCTORES + " where cedula = '"+cedula+"'";
-
-
-        Cursor cursor = db.rawQuery(ConsultaSQL, null);
-
-        cursor.moveToFirst();
-
-        int columnatelefono= cursor.getColumnIndex("telefono");
-
-        NumeroTelefono =cursor.getString(columnatelefono);
 
 
         //AQUI SE ARMA LA VISTA DESDE PASAJERO
         if(señal.equals(comparacion)){
 
-            int columna =cursor.getColumnIndex("nombre");
 
-            String nombre= cursor.getString(columna);
 
 
             TituloBienvenida.setText("Conductor");
-            NombreConductor.setText(nombre);
+          //  NombreConductor.setText(nombre);
             EditarPerfil.setVisibility(View.INVISIBLE);
             CerrarSesion.setVisibility(View.INVISIBLE);
 
@@ -192,23 +194,43 @@ public class PerfilConductorActivity extends AppCompatActivity {
         }
 
 
-        //AQUI SE ARMA LA VISTA DESE CONDUCTOR
+        //AQUI SE ARMA LA VISTA DESDE CONDUCTOR
         if(señal.equals(comparacion2)){
 
-            int columna =cursor.getColumnIndex("nombre");
 
-            String nombre= cursor.getString(columna);
+            db.child("Conductores").child(Uid).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                    if(snapshot.exists()){
+
+                        String nombre=snapshot.child("nombre").getValue().toString();
+                        TituloBienvenida.setText("Welcome");
+                        NombreConductor.setText(nombre);
+                        EditarPerfil.setVisibility(View.VISIBLE);
+                        CerrarSesion.setVisibility(View.VISIBLE);
+                        Regresar.setVisibility(View.INVISIBLE);
+                        Comentario.setVisibility(View.INVISIBLE);
+                        Comentar.setVisibility(View.INVISIBLE);
+                        Llamar.setVisibility(View.INVISIBLE);
+                        BarraCalificacion.setVisibility(View.INVISIBLE);
+
+                    }
+
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
 
 
-            TituloBienvenida.setText("Welcome");
-            NombreConductor.setText(nombre);
-            EditarPerfil.setVisibility(View.VISIBLE);
-            CerrarSesion.setVisibility(View.VISIBLE);
-            Regresar.setVisibility(View.INVISIBLE);
-            Comentario.setVisibility(View.INVISIBLE);
-            Comentar.setVisibility(View.INVISIBLE);
-            Llamar.setVisibility(View.INVISIBLE);
-            BarraCalificacion.setVisibility(View.INVISIBLE);
+
+
+
+
+
 
 
 
@@ -216,54 +238,11 @@ public class PerfilConductorActivity extends AppCompatActivity {
         }
 
 
-        //AQUI SE CARGAN LAS FOTOS DEL CONDUCTOR
 
-        int columna2 =cursor.getColumnIndex("fotoconductor");
-
-        byte[] Imagen = cursor.getBlob(columna2);
-
-
-
-        Bitmap bitmapImage = BitmapFactory.decodeByteArray(Imagen,0,Imagen.length);
-
-        FotoConductor.setImageBitmap(bitmapImage);
-
-        //AQUI SE CARGA LA FOTO DE LA MOTO
-
-        int id_conductor;
-        int columnaId=cursor.getColumnIndex("id_conductor");
-        id_conductor= cursor.getInt(columnaId);
-
-        String ConsultaSQL2 = "select fotomoto from " + Utilidades.TABLA_MOTOS + " where id_moto = '"+id_conductor+"'";
-
-        Cursor cursor2 = db.rawQuery(ConsultaSQL2, null);
-
-        cursor2.moveToFirst();
-
-        byte[] ImagenMoto = cursor2.getBlob(columnaId);
-
-
-
-        Bitmap bitmapImage2 = BitmapFactory.decodeByteArray(ImagenMoto,0,ImagenMoto.length);
-
-        FotoMoto.setImageBitmap(bitmapImage2);
-
-
-        cursor.close();
-        cursor2.close();
-        db.close();
-
-        MostrarComentario(cedulaConductor);
 
 
     }
-
-    public void onClickEditarConductor(View view){
-
-        Intent MiIntent = new Intent(getApplicationContext(),RegistroConductorActivity.class);
-        startActivity(MiIntent);
-
-    }
+    
 
     public void onClickRegresar(View view) {
 
@@ -292,9 +271,13 @@ public class PerfilConductorActivity extends AppCompatActivity {
                 "Si", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
+                        Auth.signOut();
+
                         Intent MiIntent = new Intent(getApplicationContext(),MainActivity.class);
                         startActivity(MiIntent);
                         finish();
+
+
                     }
                 }
         ).setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
@@ -306,6 +289,8 @@ public class PerfilConductorActivity extends AppCompatActivity {
         });
 
         builder.show();
+
+
 
 
 
@@ -353,11 +338,12 @@ public class PerfilConductorActivity extends AppCompatActivity {
     }
 
     public void onClickEditarPerfilConductor(View view) {
+
         Intent MiIntent =new Intent(getApplicationContext(),RegistroConductorActivity.class);
 
         Bundle MiBundle=new Bundle();
         MiBundle.putString("bandera","1");
-        MiBundle.putString("cedulaConductor",cedulaConductor);
+        MiBundle.putString("Uid",Auth.getCurrentUser().getUid().toString());
 
         MiIntent.putExtras(MiBundle);
 

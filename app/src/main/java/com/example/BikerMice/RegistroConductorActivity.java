@@ -28,11 +28,16 @@ import android.widget.Toast;
 
 import com.example.BikerMice.utilidades.Utilidades;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
@@ -585,11 +590,11 @@ public class RegistroConductorActivity extends AppCompatActivity {
         if(BundleEditarPerfil!=null){
 
 
-            String cedula =BundleEditarPerfil.getString("cedulaConductor");
+            String Uid =BundleEditarPerfil.getString("Uid");
             señal =BundleEditarPerfil.getString("bandera");
 
 
-            cargarDatos(cedula);
+            cargarDatos(Uid);
 
 
 
@@ -598,125 +603,116 @@ public class RegistroConductorActivity extends AppCompatActivity {
 
     }
 
-    private void cargarDatos(String cedula) {
+    private void cargarDatos(String Uid) {
 
-        //PRIMERO SE PREARA LA INTERFAZ GRAFICA SETEANDO TITULOS Y BOTONES
-
-        BtnActualizarPerfil.setText("ACTUALIZAR PERFIL");
-        titulo.setText("Editar perfil");
+        //PRIMERO SE PREPARA LA INTERFAZ GRAFICA SETEANDO TITULOS Y BOTONES
 
 
 
+        database.child("Conductores").child(Uid).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
 
-        ConexionSQLiteHelper conn= new ConexionSQLiteHelper(this,"dbBikerMice2",null,1);
-        SQLiteDatabase db = conn.getWritableDatabase();
+               if(snapshot.exists()){
 
-        String stringQueryConductor = "Select *  from "+Utilidades.TABLA_CONDUCTORES+" where cedula= "+cedula+"";
-
-        Cursor cursorConductor = db.rawQuery(stringQueryConductor,null);
-
-        cursorConductor.moveToFirst();
-
-
-        //AQUI SE TRAE LA INFORMACION DE LA MOTO
-
-        int id_conductor;
-        int columnaId=cursorConductor.getColumnIndex("id_conductor");
-        id_conductor= cursorConductor.getInt(columnaId);
-
-        String ConsultaSQLMoto = "select * from " + Utilidades.TABLA_MOTOS + " where id_moto = '"+id_conductor+"'";
-        Cursor cursorMoto = db.rawQuery(ConsultaSQLMoto,null);
-
-        cursorMoto.moveToFirst();
-
-
-        //SE SETA EL CAMPO NOMBRE
-
-        int columna =cursorConductor.getColumnIndex("nombre");
-        String nombre= cursorConductor.getString(columna);
-        campoNombre.setText(nombre);
-
-        //SE SETA EL CAMPO CEDULA
-
-        int columna2 =cursorConductor.getColumnIndex("cedula");
-        String cedulaConductor= cursorConductor.getString(columna2);
-        campoCedula.setText(cedulaConductor);
-        campoCedula.setKeyListener(null);
-
-        //SE SETA EL CAMPO GENERO
-
-        int columna3 =cursorConductor.getColumnIndex("genero");
-        String genero= cursorConductor.getString(columna3);
-        ComboGenero.setSelection(ObtenerPosicionSpinner(ComboGenero,genero));
-
-        //SE SETA EL CAMPO EDAD
-
-        int columna4 =cursorConductor.getColumnIndex("edad");
-        String edad= cursorConductor.getString(columna4);
-        campoEdad.setText(edad);
-
-        //SE SETA EL CAMPO TELEFONO
-
-        int columna5 =cursorConductor.getColumnIndex("telefono");
-        String telefono= cursorConductor.getString(columna5);
-        campotelefono.setText(telefono);
+                   String email=snapshot.child("email").getValue().toString();
+                   String contrasena=snapshot.child("contrasena").getValue().toString();
+                   String nombre=snapshot.child("nombre").getValue().toString();
+                   String cedula=snapshot.child("cedula").getValue().toString();
+                   String edad=snapshot.child("edad").getValue().toString();
+                   String genero=snapshot.child("genero").getValue().toString();
+                   String residencia=snapshot.child("residencia").getValue().toString();
+                   String telefono=snapshot.child("telefono").getValue().toString();
+                   String estadocivil=snapshot.child("estadocivil").getValue().toString();
+                   String laboral=snapshot.child("laboral").getValue().toString();
+                   String modelo=snapshot.child("modelo").getValue().toString();
+                   String marca=snapshot.child("marca").getValue().toString();
+                   String placa=snapshot.child("placa").getValue().toString();
+                   String diaslaborales=snapshot.child("diaslaborales").getValue().toString();
+                   String implementos=snapshot.child("implementos").getValue().toString();
 
 
-        //SE SETA EL CAMPO ESTADO CIVIL
+                   //SE SETEA EL CAMPO EMAIL
+                   campoEmail.setText(email);
+                   campoEmail.setKeyListener(null);
 
-        int columna6 =cursorConductor.getColumnIndex("estadocivil");
-        String estadocivil= cursorConductor.getString(columna6);
-        ComboEstadoCivil.setSelection(ObtenerPosicionSpinner(ComboEstadoCivil,estadocivil));
-
-        //SE SETA EL CAMPO LUGAR RESIDENCIA
-
-        int columna7 =cursorConductor.getColumnIndex("lugarresidencia");
-        String lugarresidencia= cursorConductor.getString(columna7);
-        ComboLugarResidencia.setSelection(ObtenerPosicionSpinner(ComboLugarResidencia,lugarresidencia));
-
-        //SE SETA EL CAMPO LUGAR LABORAL
-
-        int columna8 =cursorConductor.getColumnIndex("lugarlaboral");
-        String LugarLaboral= cursorConductor.getString(columna8);
-        ComboLugarLaboral.setSelection(ObtenerPosicionSpinner(ComboLugarLaboral,LugarLaboral));
-
-        //SE SETA EL CAMPO MODELO
-
-        int columna9 =cursorMoto.getColumnIndex("modelo");
-        String modelo= cursorMoto.getString(columna9);
-        campoModelo.setText(modelo);
-
-        //SE SETA EL CAMPO MARCA
-
-        int columna10 =cursorMoto.getColumnIndex("marcamoto");
-        String marcaMoto= cursorMoto.getString(columna10);
-        campoMarca.setText(marcaMoto);
-
-        //SE SETA EL CAMPO PLACA
-
-        int columna11 =cursorMoto.getColumnIndex("placa");
-        String placa= cursorMoto.getString(columna11);
-        campoPlaca.setText(placa);
+                   //SE SETEA EL CAMPO CONTRASEÑA
+                   campoPassword.setText(contrasena);
 
 
-        //SE SETA EL CAMPO IMPLEMENTOS
+                   //SE SETEA EL CAMPO CEDULA
+                   campoCedula.setText(cedula);
+                   campoCedula.setKeyListener(null);
 
-        int columna12 =cursorConductor.getColumnIndex("implementos");
-        String implementos= cursorConductor.getString(columna12);
-        campoImplementos.setText(implementos);
+                   //SE SETA EL CAMPO NOMBRE
+                   campoNombre.setText(nombre);
 
-        //SE SETA EL CAMPO HORARIOLABORAL
+                   //SE SETA EL CAMPO EDAD
+                   campoEdad.setText(edad);
 
-        int columna15 =cursorConductor.getColumnIndex("diaslaborales");
-        String diaslaborales= cursorConductor.getString(columna15);
-        campoDiasLaborales.setText(diaslaborales);
+                   //SE SETEA EL CAMPO GENERO
+                   ComboGenero.setSelection(ObtenerPosicionSpinner(ComboGenero,genero));
+
+                   //SE SETEA EL CAMPO LUGAR DE RESIDENCIA
+                   ComboLugarResidencia.setSelection(ObtenerPosicionSpinner(ComboLugarResidencia,residencia));
+
+                   //SE SETEA EL CAMPO telefono
+                   campotelefono.setText(telefono);
+
+                   //SE SETEA EL CAMPO Estado civil
+                   ComboEstadoCivil.setSelection(ObtenerPosicionSpinner(ComboEstadoCivil,estadocivil));
+
+
+                   //SE SETEA EL CAMPO LugarLaboral
+                   ComboLugarLaboral.setSelection(ObtenerPosicionSpinner(ComboLugarLaboral,laboral));
+
+                   //SE SETEA EL CAMPO Modelo
+                   campoModelo.setText(modelo);
+
+                   //SE SETEA EL CAMPO MARCA
+                   campoMarca.setText(marca);
+
+                   //SE SETEA EL CAMPO PLACA
+                   campoPlaca.setText(placa);
+
+                   //SE SETEA EL CAMPO Dias Laborales
+                   campoDiasLaborales.setText(diaslaborales);
+
+                   //SE SETEA EL CAMPO Dias Implemetos
+                   campoImplementos.setText(implementos);
+
+                   //SE SETEA EL BOTON CREAR CUENTA
+
+                   BtnActualizarPerfil.setText("Actualizar perfil");
+
+                   //SE SETA EL TITULO DE LA VENTA
+
+                   titulo.setText("Editar perfil");
 
 
 
+
+
+
+
+               }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+
+
+
+//Aqui esta la parte de las fotos
+/*
         //SE SETA LA FOTO DEL CONDUCTOR
 
         int columna13 =cursorConductor.getColumnIndex("fotoconductor");
-
         byte[] Imagen = cursorConductor.getBlob(columna13);
 
        
@@ -746,7 +742,7 @@ public class RegistroConductorActivity extends AppCompatActivity {
         db.close();
 
 
-
+*/
 
 
     }
@@ -777,13 +773,7 @@ public class RegistroConductorActivity extends AppCompatActivity {
 
         if(bandera.equals(señal)){
 
-
-
             ActualizarPerfil();
-            Intent MyIntent = new Intent(getApplicationContext(),MainActivity.class);
-            startActivity(MyIntent);
-            finish();
-
 
         }else{
 
@@ -805,62 +795,96 @@ public class RegistroConductorActivity extends AppCompatActivity {
 
     private void ActualizarPerfil() {
 
-        ConexionSQLiteHelper conn=new ConexionSQLiteHelper(this,"dbBikerMice2",null,1);
-
-        SQLiteDatabase db= conn.getWritableDatabase();
-
-        ContentValues values = new ContentValues();
-        ContentValues values2 = new ContentValues();
-
-        //CONSULTA PARA SABER EL ID DEL CONDUCTOR
-        String stringQuery = "Select id_conductor from conductores where cedula= "+campoCedula.getText().toString()+"";
-
-        Cursor cursorConductor = db.rawQuery(stringQuery,null);
-
-        cursorConductor.moveToFirst();
-        int columna =cursorConductor.getColumnIndex("id_conductor");
-
-        String id_conductor= cursorConductor.getString(columna);
-        ////////////////////////////////////////////////////////////////////////////
-
-
-        //AQUI EMPIEZA EL PROCESO DE ACTUALIZACION
-        byte[] fotoConductor=CrearBit(1);
-        byte[] fotoMoto=CrearBit(2);
-
+        String genero = "Genero";
+        String residencia="Lugar de residencia";
+        String civil="Estado civil";
+        String laboral="Lugar laboral";
         String DiasLaborales2 = SacarDias();
 
+        if(!campoCedula.getText().toString().isEmpty() &&
+                !campoNombre.getText().toString().isEmpty() &&
+                !campoEdad.getText().toString().isEmpty() &&
+                !campoEmail.getText().toString().isEmpty() &&
+                !campoPassword.getText().toString().isEmpty() &&
+                !generoConductor.equals(genero) &&
+                !LugarResidencia.equals(residencia) &&
+                !EstadoCivil.equals(civil) &&
+                !campotelefono.getText().toString().isEmpty() &&
+                !LugarLaboral.equals(laboral) &&
+                !campoMarca.getText().toString().isEmpty() &&
+                !campoModelo.getText().toString().isEmpty() &&
+                !campoPlaca.getText().toString().isEmpty() &&
+                !DiasLaborales2.equals("")
 
-        String[] parametro = {campoCedula.getText().toString()};
-        String[] parametro2 = {id_conductor};
 
-        //ESTO VA PARA LA TABLA CONDUCTOR
+        ){
+            if(campoPassword.getText().toString().length()>=6) {
 
-        values.put(Utilidades.CAMPO_CEDULA,campoCedula.getText().toString());
-        values.put(Utilidades.CAMPO_NOMBRE,campoNombre.getText().toString());
-        values.put(Utilidades.CAMPO_GENERO,generoConductor);
-        values.put(Utilidades.CAMPO_EDAD,campoEdad.getText().toString());
-        values.put(Utilidades.CAMPO_TELEFONO,campotelefono.getText().toString());
-        values.put(Utilidades.CAMPO_LUGARRESIDENCIA,LugarResidencia);
-        values.put(Utilidades.CAMPO_LUGARLABORAL,LugarLaboral);
-        values.put(Utilidades.CAMPO_ESTADOCIVIL,EstadoCivil);
-        values.put(Utilidades.CAMPO_IMPLEMENTOS,campoImplementos.getText().toString());
-        values.put(Utilidades.CAMPO_DIASLABORALES,DiasLaborales2);
-        values.put(Utilidades.CAMPO_FOTO_CONDUCTOR,fotoConductor);
+                Map<String,Object> map =new HashMap<>();
 
-        //ESTO VA PARA LA TABLA MOTO
+                map.put("email",campoEmail.getText().toString());
+                map.put("cedula",campoCedula.getText().toString());
+                map.put("contrasena",campoPassword.getText().toString());
+                map.put("nombre",campoNombre.getText().toString());
+                map.put("genero",generoConductor);
+                map.put("edad",campoEdad.getText().toString());
+                map.put("telefono",campotelefono.getText().toString());
+                map.put("estadocivil",EstadoCivil);
+                map.put("residencia",LugarResidencia);
+                map.put("laboral",LugarLaboral);
+                map.put("modelo",campoModelo.getText().toString());
+                map.put("marca",campoMarca.getText().toString());
+                map.put("placa",campoPlaca.getText().toString());
+                map.put("diaslaborales",DiasLaborales2) ;
 
-        values2.put(Utilidades.CAMPO_MARCAMOTO,campoMarca.getText().toString());
-        values2.put(Utilidades.CAMPO_MODELO,campoModelo.getText().toString());
-        values2.put(Utilidades.CAMPO_PLACA,campoPlaca.getText().toString());
-        values2.put(Utilidades.CAMPO_FOTOMOTO,fotoMoto);
+                database.child("Conductores").child(Auth.getCurrentUser().getUid().toString()).updateChildren(map).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void unused) {
 
-        db.update(Utilidades.TABLA_CONDUCTORES,values,Utilidades.CAMPO_CEDULA+="=?",parametro);
-        db.update(Utilidades.TABLA_MOTOS,values2,Utilidades.CAMPO_ID_MOTO+="=?",parametro2);
-        Toast.makeText(getApplicationContext(),"se actualizo correctamente ",Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(), "Usuario Actualizado con exito", Toast.LENGTH_SHORT).show();
 
-        cursorConductor.close();
-        db.close();
+                        Intent MiIntent = new Intent(getApplicationContext(),PerfilConductorActivity.class);
+
+                        Bundle MiBundle=new Bundle();
+                        MiBundle.putString("Uid",Auth.getCurrentUser().getUid());
+                        MiBundle.putString("señal","2");
+
+                        MiIntent.putExtras(MiBundle);
+
+                        startActivity(MiIntent);
+                        finish();
+
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+
+                        Toast.makeText(getApplicationContext(), "Actualizacion fallida", Toast.LENGTH_SHORT).show();
+
+
+                    }
+                });
+
+
+
+
+            }else{
+
+                Toast.makeText(getApplicationContext(), "La contraseña debe tener al menos 6 caracteres", Toast.LENGTH_SHORT).show();
+
+            }
+
+
+        }else {
+
+
+            Toast.makeText(getApplicationContext(), "rellene todos los campos", Toast.LENGTH_SHORT).show();
+
+
+        }
+
+
+
 
 
     }
@@ -964,6 +988,7 @@ public class RegistroConductorActivity extends AppCompatActivity {
 
                             map.put("email",campoEmail.getText().toString());
                             map.put("contrasena",campoPassword.getText().toString());
+                            map.put("cedula",campoCedula.getText().toString());
                             map.put("nombre",campoNombre.getText().toString());
                             map.put("genero",generoConductor);
                             map.put("edad",campoEdad.getText().toString());
@@ -975,6 +1000,7 @@ public class RegistroConductorActivity extends AppCompatActivity {
                             map.put("marca",campoMarca.getText().toString());
                             map.put("placa",campoPlaca.getText().toString());
                             map.put("diaslaborales",DiasLaborales2) ;
+                            map.put("implementos",campoImplementos.getText().toString()) ;
 
                             String id = Auth.getCurrentUser().getUid();
 
@@ -1018,9 +1044,6 @@ public class RegistroConductorActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "La contraseña debe tener al menos 6 caracteres", Toast.LENGTH_SHORT).show();
 
             }
-
-
-
 
 
         }else {
