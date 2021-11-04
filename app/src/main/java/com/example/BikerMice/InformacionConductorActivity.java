@@ -3,21 +3,43 @@ package com.example.BikerMice;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.BikerMice.utilidades.Utilidades;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class InformacionConductorActivity extends AppCompatActivity {
 
 
     ListView ListaInformacion;
-    ArrayList<String> InfoConductor;
+    ArrayList<String> InfoConductor =new ArrayList<String>();
     ConexionSQLiteHelper conn;
+    FirebaseAuth Auth;
+    DatabaseReference db;
+    TextView CampoNombre,CampoCedula,CampoEstadocivil,CampoGenero,CampoEdad,CampoResidencia,CampoDiasLaborales,CampoLugarLaboral;
+    TextView CampoMarca,CampoPlaca,CampoModelo,CampoImplementos;
+
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,87 +47,120 @@ public class InformacionConductorActivity extends AppCompatActivity {
         setContentView(R.layout.activity_informacion_conductor);
 
 
-        ListaInformacion = findViewById(R.id.ListaInformacionConductor);
+      //  ListaInformacion = findViewById(R.id.ListaInformacionConductor);
 
-        Bundle MiBundle = this.getIntent().getExtras();
+        Auth=FirebaseAuth.getInstance();
+        db=FirebaseDatabase.getInstance().getReference();
+        LlenarLista(Auth.getCurrentUser().getUid().toString());
 
-        String cedulaConductor =MiBundle.getString("cedulaConductor");
+    //    ListaInformacion.setAdapter(new Adaptador(this,InfoConductor));
 
-        LlenarLista(cedulaConductor);
-        ListaInformacion.setAdapter(new Adaptador(this,InfoConductor));
+
+
+        CampoNombre=findViewById(R.id.textViewNombre);
+        CampoCedula=findViewById(R.id.textViewCedula);
+        CampoEdad=findViewById(R.id.textViewEdad);
+        CampoGenero=findViewById(R.id.textViewGenero);
+        CampoEstadocivil=findViewById(R.id.textViewEstadoCivil);
+        CampoLugarLaboral=findViewById(R.id.textViewLugarLaboral);
+        CampoResidencia=findViewById(R.id.textViewLugarResidencia);
+        CampoDiasLaborales=findViewById(R.id.textViewDiasLaborales);
+
+        CampoModelo=findViewById(R.id.textViewModelo);
+        CampoMarca=findViewById(R.id.textViewMarca);
+        CampoPlaca=findViewById(R.id.textViewPlaca);
+        CampoImplementos=findViewById(R.id.textViewImplementosVehiculo);
+
+
+
 
 
     }
 
-    private void LlenarLista(String cedulaConductor) {
+    private void LlenarLista(String Uid) {
 
-        Bundle MiBundle = this.getIntent().getExtras();
-
-        int id_conductor =MiBundle.getInt("id_conductor");
-        InfoConductor = new ArrayList<String>();
-
-        conn = new ConexionSQLiteHelper(getApplicationContext(),"dbBikerMice2",null,1);
-
-        SQLiteDatabase db = conn.getReadableDatabase();
-
-        String ConsultaSQL = "select * from " + Utilidades.TABLA_CONDUCTORES + " where cedula = '"+cedulaConductor+"'";
-        String ConsultaSQL2 = "select * from " + Utilidades.TABLA_MOTOS + " where id_moto = '"+id_conductor+"'";
-
-        Cursor cursor = db.rawQuery(ConsultaSQL, null);
-        Cursor cursor2 = db.rawQuery(ConsultaSQL2,null);
+        final String[] nombreConductor = new String[1];
+        final String[] cedulaConductor = new String[1];
 
 
-        while (cursor.moveToNext() && cursor2.moveToNext()) {
+        db.child("Conductores").child(Uid).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
 
-            String cedula = cursor.getString(1);
-            InfoConductor.add("Cedula: "+cedula);
+                if(snapshot.exists()){
 
-            String nombre = cursor.getString(2);
-            InfoConductor.add("Nombre: "+nombre);
 
-            String genero = cursor.getString(3);
-            InfoConductor.add("Genero: "+genero);
+                    CampoNombre.setText(snapshot.child("nombre").getValue().toString());
+                    CampoCedula.setText(snapshot.child("cedula").getValue().toString());
+                    CampoEdad.setText(snapshot.child("edad").getValue().toString());
+                    CampoGenero.setText(snapshot.child("genero").getValue().toString());
+                    CampoEstadocivil.setText("Estado civil: "+ snapshot.child("estadocivil").getValue().toString());
+                    CampoLugarLaboral.setText(snapshot.child("laboral").getValue().toString());
+                    CampoResidencia.setText(snapshot.child("residencia").getValue().toString());
+                    CampoDiasLaborales.setText(snapshot.child("diaslaborales").getValue().toString());
 
-            String edad = cursor.getString(4);
-            InfoConductor.add("Edad: "+edad);
-
-            String telefono = cursor.getString(5);
-            InfoConductor.add("Telefono: "+telefono);
-
-            String lugarresidencia = cursor.getString(6);
-            InfoConductor.add("Vivo en: "+lugarresidencia);
-
-            String lugarlaboral = cursor.getString(7);
-            InfoConductor.add("Trabajo en: "+lugarlaboral);
-
-            String estadocivil = cursor.getString(8);
-            InfoConductor.add("Estoy: "+estadocivil);
-
-            String implementos = cursor.getString(9);
-            InfoConductor.add("Te ofrezco: "+implementos);
-
-            String diaslaborales = cursor.getString(10);
-            InfoConductor.add("Trabajo:\n"+diaslaborales);
-
-            String modelo = cursor2.getString(2);
-            InfoConductor.add("Modelo moto: "+modelo);
-
-            String placa = cursor2.getString(1);
-            InfoConductor.add("Placa: "+placa);
-
-            String marca = cursor2.getString(3);
-            InfoConductor.add("Marca: "+marca);
-
-        }
-
-        cursor.close();
-        cursor2.close();
-        db.close();
+                    CampoModelo.setText(snapshot.child("modelo").getValue().toString());
+                    CampoMarca.setText(snapshot.child("marca").getValue().toString());
+                    CampoPlaca.setText(snapshot.child("placa").getValue().toString());
+                    CampoImplementos.setText(snapshot.child("implementos").getValue().toString());
 
 
 
 
 
+
+
+
+
+
+
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+
+
+
+
+
+     /*   db.child("Conductores").child(Uid).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                if(snapshot.exists()){
+
+
+                    for(DataSnapshot snapshot2: ){
+
+                        InfoConductor.add("Cedula: " + snapshot2.getValue());
+
+
+
+                    }
+
+
+
+
+
+
+
+
+
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+*/
 
     }
 

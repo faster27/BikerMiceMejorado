@@ -304,34 +304,7 @@ public class PerfilConductorActivity extends AppCompatActivity {
     public void onClickMasInformacion(View view) {
 
 
-        SQLiteDatabase db = conn.getReadableDatabase();
-        String ConsultaSQL = "select id_conductor from " + Utilidades.TABLA_CONDUCTORES +" where cedula ="+cedulaConductor;
-
-
-        Cursor cursor = db.rawQuery(ConsultaSQL, null);
-
-        int columna = cursor.getColumnIndex("id_conductor");
-
-        cursor.moveToFirst();
-
-        int id_conductor=cursor.getInt(columna);
-
-
-
         Intent MiIntent = new Intent(getApplicationContext(),InformacionConductorActivity.class);
-
-        Bundle MiBundleRegreso=new Bundle();
-        MiBundleRegreso.putString("cedulaConductor",cedulaConductor);
-        MiBundleRegreso.putString("señal",señal);
-        MiBundleRegreso.putInt("id_conductor",id_conductor);
-
-        MiBundleRegreso.putString("edad",BundleRegreso.getString("edad"));
-        MiBundleRegreso.putString("genero",BundleRegreso.getString("genero"));
-        MiBundleRegreso.putString("LugarLaboral",BundleRegreso.getString("lugarlaboral"));
-        MiBundleRegreso.putString("Modelo",BundleRegreso.getString("modelo"));
-        MiBundleRegreso.putString("cedulapasajero",BundleRegreso.getString("cedulapasajero"));
-
-        MiIntent.putExtras(MiBundleRegreso);
         startActivity(MiIntent);
         finish();
 
