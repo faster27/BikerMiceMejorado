@@ -836,6 +836,7 @@ public class RegistroConductorActivity extends AppCompatActivity {
                 map.put("marca",campoMarca.getText().toString());
                 map.put("placa",campoPlaca.getText().toString());
                 map.put("diaslaborales",DiasLaborales2) ;
+                map.put("implementos",campoImplementos.getText().toString());
 
                 database.child("Conductores").child(Auth.getCurrentUser().getUid().toString()).updateChildren(map).addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
