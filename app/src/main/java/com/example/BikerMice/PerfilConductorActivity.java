@@ -196,6 +196,7 @@ public class PerfilConductorActivity extends AppCompatActivity {
                         for (DataSnapshot ds : snapshot.getChildren()){
 
                             nombre[0] =    ds.child("nombre").getValue().toString();
+                            NumeroTelefono =ds.child("telefono").getValue().toString();
 
 
 
