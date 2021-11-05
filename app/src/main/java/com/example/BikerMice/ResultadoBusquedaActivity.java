@@ -1,18 +1,37 @@
 package com.example.BikerMice;
 
+import static android.content.ContentValues.TAG;
+
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.arch.core.executor.DefaultTaskExecutor;
+
+import android.hardware.camera2.TotalCaptureResult;
 import android.os.Bundle;
+import android.provider.ContactsContract;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.example.BikerMice.entidades.Conductor;
 import com.example.BikerMice.utilidades.Utilidades;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 
 public class ResultadoBusquedaActivity extends AppCompatActivity {
 
@@ -29,31 +48,47 @@ public class ResultadoBusquedaActivity extends AppCompatActivity {
     String modelo ;
     String cedulaPasajero;
 
+    DatabaseReference database;
+    FirebaseAuth Auth;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_resultado_busqueda);
 
-        conn = new ConexionSQLiteHelper(getApplicationContext(),"dbBikerMice2",null,1);
+
 
         ListaConductores=findViewById(R.id.ListaConductores);
+        Auth=FirebaseAuth.getInstance();
 
 
         Bundle MiBundle = this.getIntent().getExtras();
 
-        edad =MiBundle.getString("edad");
-        genero =MiBundle.getString("genero");
-        LugarLaboral =MiBundle.getString("LugarLaboral");
-        modelo =MiBundle.getString("Modelo");
-        cedulaPasajero=MiBundle.getString("cedulapasajero");
+        if (MiBundle != null){
+            edad =MiBundle.getString("edad");
+            genero =MiBundle.getString("genero");
+            LugarLaboral =MiBundle.getString("LugarLaboral");
+            modelo =MiBundle.getString("modelo");
+
+
+        }
+
+
+
+        database = FirebaseDatabase.getInstance().getReference();
+        listaConductor = new ArrayList<Conductor>();
+        listaInformacion = new ArrayList<String>();
 
 
         ConsultarConductores(edad,genero,LugarLaboral,modelo);
 
 
 
-        ListaConductores.setAdapter(new Adaptador(this,listaInformacion));
+
+
+
 
         ListaConductores.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -61,24 +96,26 @@ public class ResultadoBusquedaActivity extends AppCompatActivity {
                 String cedula = listaConductor.get(i).getCedula();
                 String señal = "1";
 
-                Intent MiIntent= new Intent(getApplicationContext(),PerfilConductorActivity.class);
 
-                Bundle MiBundle=new Bundle();
-                MiBundle.putString("cedula",cedula);
+                Bundle MiBundle = new Bundle();
+
+                MiBundle.putString("cedula", cedula);
                 MiBundle.putString("señal",señal);
-
-                //BUNDLES PARA EL REGRESO
                 MiBundle.putString("edad",edad);
                 MiBundle.putString("genero",genero);
-                MiBundle.putString("lugarlaboral",LugarLaboral);
+                MiBundle.putString("LugarLaboral",LugarLaboral);
                 MiBundle.putString("modelo",modelo);
-                MiBundle.putString("cedulapasajero",cedulaPasajero);
 
+                Intent MiIntent = new Intent(getApplicationContext(),PerfilConductorActivity.class);
 
                 MiIntent.putExtras(MiBundle);
 
+
                 startActivity(MiIntent);
                 finish();
+
+
+
 
             }
         }
@@ -94,99 +131,197 @@ public class ResultadoBusquedaActivity extends AppCompatActivity {
     private void ConsultarConductores(String edad,String genero, String LugarLaboral, String Modelo) {
 
 
-        String prueba2 ="";
-        String Genero="Genero";
-        String Laboral="Lugar laboral";
-        String Consulta = "";
+
+        String comparacion =null;
+        String comparacion2 = "Genero";
+        String comparacion3 = "Lugar laboral";
+
+        listaInformacion = new ArrayList<String>();
+
+        //AQUI SE CONSULTA POR EDAD
+
+        if(!(edad==null) && genero.equals(comparacion2) && LugarLaboral.equals(comparacion3) && Modelo==null ) {
 
 
-        //AQUI SE ARMA EL STRING CONDICION CUANDO ELIGEN SOLO UN FILTRO
+            database.child("Conductores").orderByChild("edad").equalTo(edad).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
 
-        if (!edad.equals(prueba2) || !genero.equals(Genero) || !LugarLaboral.equals(Laboral)) {
-
-            if ((!edad.equals(prueba2) && genero.equals(Genero) && LugarLaboral.equals(Laboral))) {
-
-                Consulta+= "edad = '"+edad+"'";
-
-            }
-
-            if (edad.equals(prueba2) && !genero.equals(Genero) && LugarLaboral.equals(Laboral)) {
-
-                Consulta+= "genero = '"+genero+"'";
-
-            }
-
-            if (edad.equals(prueba2) && genero.equals(Genero) && !LugarLaboral.equals(Laboral)) {
-
-                Consulta+= "lugarlaboral = '"+LugarLaboral+"'";
-
-            }
-
-            if (!edad.equals(prueba2) && genero.equals(Genero) && !LugarLaboral.equals(Laboral)) {
-
-                Consulta += "edad = '" + edad + "' and ";
-                Consulta+= "lugarlaboral = '"+LugarLaboral+"'";
-
-            }
-
-            if (!edad.equals(prueba2) && !genero.equals(Genero) && LugarLaboral.equals(Laboral)) {
-
-                Consulta += "edad = '" + edad + "' and ";
-                Consulta += "genero = '" + genero + "' ";
-
-            }
-
-            if (edad.equals(prueba2) && !genero.equals(Genero) && !LugarLaboral.equals(Laboral)) {
-
-                Consulta += "genero = '" + genero + "' and ";
-                Consulta += "lugarlaboral = '" + LugarLaboral + "'";
-
-            }
-
-            if (!edad.equals(prueba2) && !genero.equals(Genero) && !LugarLaboral.equals(Laboral)) {
-
-                Consulta += "edad = '" + edad + "' and ";
-                Consulta += "genero = '" + genero + "' and ";
-                Consulta += "lugarlaboral = '" + LugarLaboral + "'";
-
-            }
+                    if (snapshot.exists()) {
 
 
+                        for (DataSnapshot ds : snapshot.getChildren()) {
 
+                            Conductor conductor = new Conductor();
+
+                            conductor = ds.getValue(Conductor.class);
+
+                            listaConductor.add(conductor);
+
+
+                        }
+
+                        ObtenerLista();
+
+                        ListaConductores.setAdapter(new Adaptador(getApplicationContext(), listaInformacion));
+
+
+                    }
+
+
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+
+
+        }
+
+        if(edad==null && !genero.equals(comparacion2) && LugarLaboral.equals(comparacion3) && Modelo==null ) {
+
+
+            database.child("Conductores").orderByChild("genero").equalTo(genero).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                    if (snapshot.exists()) {
+
+
+                        for (DataSnapshot ds : snapshot.getChildren()) {
+
+                            Conductor conductor = new Conductor();
+
+                            conductor = ds.getValue(Conductor.class);
+
+                            listaConductor.add(conductor);
+
+
+                        }
+
+                        ObtenerLista();
+
+                        ListaConductores.setAdapter(new Adaptador(getApplicationContext(), listaInformacion));
+
+
+                    }
+
+
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+
+
+        }
+
+        //AQUI SE CONSULTA POR LUGAR LABORAL
+
+        if(edad==null && genero.equals(comparacion2) && !LugarLaboral.equals(comparacion3) && Modelo==null ) {
+
+
+            database.child("Conductores").orderByChild("laboral").equalTo(LugarLaboral).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                    if (snapshot.exists()) {
+
+
+                        for (DataSnapshot ds : snapshot.getChildren()) {
+
+                            Conductor conductor = new Conductor();
+
+                            conductor = ds.getValue(Conductor.class);
+
+                            listaConductor.add(conductor);
+
+
+                        }
+
+                        ObtenerLista();
+
+                        ListaConductores.setAdapter(new Adaptador(getApplicationContext(), listaInformacion));
+
+
+                    }
+
+
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+
+
+        }
+
+
+        //AQUI SE CONSULTA POR Modelo
+
+        if(edad==null && genero.equals(comparacion2) && LugarLaboral.equals(comparacion3) && !(Modelo==null) ) {
+
+
+            database.child("Conductores").orderByChild("modelo").equalTo(Modelo).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                    if (snapshot.exists()) {
+
+
+                        for (DataSnapshot ds : snapshot.getChildren()) {
+
+                            Conductor conductor = new Conductor();
+
+                            conductor = ds.getValue(Conductor.class);
+
+                            listaConductor.add(conductor);
+
+
+                        }
+
+                        ObtenerLista();
+
+                        ListaConductores.setAdapter(new Adaptador(getApplicationContext(), listaInformacion));
+
+
+                    }
+
+
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
 
 
         }
 
 
 
-            SQLiteDatabase db = conn.getReadableDatabase();
-
-            Conductor conductor = null;
-            listaConductor = new ArrayList<Conductor>();
-            String where2 = "where";
-            where2 += " " + Consulta;
-
-            String ConsultaSQL = "select cedula,nombre from " + Utilidades.TABLA_CONDUCTORES + " " + where2;
 
 
-            Cursor cursor = db.rawQuery(ConsultaSQL, null);
-
-            while (cursor.moveToNext()) {
-
-                conductor = new Conductor();
-
-                conductor.setCedula(cursor.getString(0));
-                conductor.setNombre(cursor.getString(1));
-
-                listaConductor.add(conductor);
-
-            }
-
-            ObtenerLista();
 
 
-            cursor.close();
-            db.close();
+
+
+
+
+
+
+
+
+
+
+
 
 
     }
@@ -194,7 +329,9 @@ public class ResultadoBusquedaActivity extends AppCompatActivity {
 
     private void ObtenerLista() {
 
-        listaInformacion = new ArrayList<String>();
+
+
+
 
         for(int i=0; i<listaConductor.size();i++){
 
@@ -213,7 +350,9 @@ public class ResultadoBusquedaActivity extends AppCompatActivity {
 
         Bundle MiBundle=new Bundle();
 
-        MiBundle.putString("cedula",cedulaPasajero);
+
+
+        MiBundle.putString("Uid",Auth.getCurrentUser().getUid().toString());
 
 
         MiIntent.putExtras(MiBundle);

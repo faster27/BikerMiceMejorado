@@ -8,33 +8,87 @@ public class Conductor {
     private  String genero;
     private String edad;
     private String telefono;
-    private String lugarresidencia;
-    private String lugarlaboral;
+    private String residencia;
+    private String laboral;
     private String estadocivil;
     private String implementos;
-    private String diasLaborales;
+    private String diaslaborales;
     private Byte[] foto;
+    private String marca;
+    private String modelo;
+    private String placa;
+    private String email;
+    private String contrasena;
 
 
 
 
-    public Conductor(int id_conductor, String cedula, String nombre, String genero, String edad, String telefono, String lugarresidencia, String lugarlaboral, String estadocivil, String implementos, String diasLaborales, Byte[] foto) {
+    public Conductor(int id_conductor, String cedula, String nombre, String genero,
+                     String edad, String telefono, String lugarresidencia, String lugarlaboral,
+                     String estadocivil, String implementos, String diasLaborales, Byte[] foto,
+                     String marca, String modelo, String placa, String email, String contrasena) {
         this.id_conductor=id_conductor;
         this.cedula = cedula;
         this.nombre = nombre;
         this.genero = genero;
         this.edad = edad;
         this.telefono = telefono;
-        this.lugarresidencia = lugarresidencia;
-        this.lugarlaboral = lugarlaboral;
+        this.residencia = lugarresidencia;
+        this.laboral = lugarlaboral;
         this.estadocivil = estadocivil;
         this.implementos = implementos;
-        this.diasLaborales=diasLaborales;
+        this.diaslaborales =diasLaborales;
         this.foto=foto;
+
+        this.marca= marca;
+        this.modelo=modelo;
+        this.placa=placa;
+        this.email=email;
+        this.contrasena=contrasena;
     }
 
     public Conductor() {
 
+    }
+
+    public String getMarca() {
+        return marca;
+    }
+
+    public void setMarca(String marca) {
+        this.marca = marca;
+    }
+
+    public String getModelo() {
+        return modelo;
+    }
+
+    public void setModelo(String modelo) {
+        this.modelo = modelo;
+    }
+
+    public String getPlaca() {
+        return placa;
+    }
+
+    public void setPlaca(String placa) {
+        this.placa = placa;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getContrasena() {
+        return contrasena;
+    }
+
+    public void setContrasena(String contrasena) {
+        this.contrasena = contrasena;
     }
 
 
@@ -45,12 +99,12 @@ public class Conductor {
     public void setFoto(Byte[] foto) {
         this.foto = foto;
     }
-    public String getDiasLaborales() {
-        return diasLaborales;
+    public String getDiaslaborales() {
+        return diaslaborales;
     }
 
-    public void setDiasLaborales(String diasLaborales) {
-        this.diasLaborales = diasLaborales;
+    public void setDiaslaborales(String diaslaborales) {
+        this.diaslaborales = diaslaborales;
     }
 
     public int getId_conductor() {
@@ -109,20 +163,20 @@ public class Conductor {
         this.telefono = telefono;
     }
 
-    public String getLugarresidencia() {
-        return lugarresidencia;
+    public String getResidencia() {
+        return residencia;
     }
 
-    public void setLugarresidencia(String lugarresidencia) {
-        this.lugarresidencia = lugarresidencia;
+    public void setResidencia(String residencia) {
+        this.residencia = residencia;
     }
 
-    public String getLugarlaboral() {
-        return lugarlaboral;
+    public String getLaboral() {
+        return laboral;
     }
 
-    public void setLugarlaboral(String lugarlaboral) {
-        this.lugarlaboral = lugarlaboral;
+    public void setLaboral(String laboral) {
+        this.laboral = laboral;
     }
 
     public String getEstadocivil() {

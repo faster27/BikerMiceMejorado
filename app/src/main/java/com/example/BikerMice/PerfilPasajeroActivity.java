@@ -198,34 +198,43 @@ public class PerfilPasajeroActivity extends AppCompatActivity {
         String edad =Edad.getText().toString();
         String Genero = GeneroBusqueda;
         String Laboral=LaboralBusqueda;
+        String modelo=Modelo.getText().toString();
 
-        if (edad.equals(comparacion) && Genero.equals(GeneroComparacion) && Laboral.equals(LaboralComparacion)){
-
-
-            Toast.makeText(getApplicationContext(),"Seleccione al menos un filtro",Toast.LENGTH_LONG).show();
+        Bundle MiBundle=new Bundle();
 
 
-        }else{
-            Intent MiIntent = new Intent(getApplicationContext(),ResultadoBusquedaActivity.class);
+        if (!edad.equals(comparacion)){
 
-            Bundle MiBundle=new Bundle();
-
-           // MiBundle.putString("cedulapasajero",cedula);
             MiBundle.putString("edad", Edad.getText().toString());
-            MiBundle.putString("genero",GeneroBusqueda);
-            MiBundle.putString("LugarLaboral",LaboralBusqueda);
-            MiBundle.putString("Modelo",Modelo.getText().toString());
-
-
-            MiIntent.putExtras(MiBundle);
-
-
-
-            startActivity(MiIntent);
-            finish();
 
         }
 
+        if (!Genero.equals(comparacion)){
+
+            MiBundle.putString("genero",GeneroBusqueda);
+
+        }
+
+        if (!LugarLaboral.equals(comparacion)){
+
+            MiBundle.putString("LugarLaboral",LaboralBusqueda);
+
+        }
+
+        if (!modelo.equals(comparacion)){
+
+            MiBundle.putString("modelo",modelo);
+
+        }
+
+
+        Intent MiIntent = new Intent(getApplicationContext(),ResultadoBusquedaActivity.class);
+
+
+        MiIntent.putExtras(MiBundle);
+
+        startActivity(MiIntent);
+        finish();
 
 
 

@@ -22,6 +22,7 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.BikerMice.entidades.Conductor;
 import com.example.BikerMice.utilidades.Utilidades;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.FirebaseAuth;
@@ -44,6 +45,7 @@ public class PerfilConductorActivity extends AppCompatActivity {
     TextView TituloBienvenida;
     ImageView EditarPerfil,Regresar,CerrarSesion,FotoConductor,FotoMoto,Llamar;
     Bundle BundleRegreso;
+    Bundle MiBundle;
     Button Comentar;
     EditText Comentario;
     String señal;
@@ -51,6 +53,7 @@ public class PerfilConductorActivity extends AppCompatActivity {
     RatingBar BarraCalificacion;
     ArrayList<String> listaInformacion;
     float Rating;
+    String cedula="";
 
     FirebaseAuth Auth;
     DatabaseReference db;
@@ -80,11 +83,12 @@ public class PerfilConductorActivity extends AppCompatActivity {
         db=FirebaseDatabase.getInstance().getReference();
 
 
-        BundleRegreso=this.getIntent().getExtras();
-        Bundle MiBundle = this.getIntent().getExtras();
+
+        MiBundle = this.getIntent().getExtras();
 
 
         señal =MiBundle.getString("señal");
+        cedula=MiBundle.getString("cedula");
 
 
 
@@ -101,7 +105,7 @@ public class PerfilConductorActivity extends AppCompatActivity {
 
 
 
-       CargarDatos(Auth.getCurrentUser().getUid(),señal);
+       CargarDatos(Auth.getCurrentUser().getUid(),señal,cedula);
 
 
        // ListaComentario.setAdapter(new Adaptador(this,listaInformacion));
@@ -169,10 +173,11 @@ public class PerfilConductorActivity extends AppCompatActivity {
 
     }
 
-    private void CargarDatos(String Uid,String señal) {
+    private void CargarDatos(String Uid,String señal,String cedula) {
 
         String comparacion="1";
         String comparacion2="2";
+        final String[] nombre = new String[1];
 
 
 
@@ -182,12 +187,37 @@ public class PerfilConductorActivity extends AppCompatActivity {
 
 
 
+            db.child("Conductores").orderByChild("cedula").equalTo(cedula).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
 
-            TituloBienvenida.setText("Conductor");
-          //  NombreConductor.setText(nombre);
-            EditarPerfil.setVisibility(View.INVISIBLE);
-            CerrarSesion.setVisibility(View.INVISIBLE);
+                    if(snapshot.exists()){
 
+                        for (DataSnapshot ds : snapshot.getChildren()){
+
+                            nombre[0] =    ds.child("nombre").getValue().toString();
+
+
+
+
+                        }
+
+
+
+                        TituloBienvenida.setText("Conductor");
+                        NombreConductor.setText(nombre[0]);
+                        EditarPerfil.setVisibility(View.INVISIBLE);
+                        CerrarSesion.setVisibility(View.INVISIBLE);
+
+                    }
+
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
 
 
 
@@ -248,15 +278,14 @@ public class PerfilConductorActivity extends AppCompatActivity {
 
         Intent MiIntent = new Intent(getApplicationContext(),ResultadoBusquedaActivity.class);
 
-        //BUNDLES PARA EL REGRESO
-        Bundle MiBundleRegreso=new Bundle();
-        MiBundleRegreso.putString("edad",BundleRegreso.getString("edad"));
-        MiBundleRegreso.putString("genero",BundleRegreso.getString("genero"));
-        MiBundleRegreso.putString("LugarLaboral",BundleRegreso.getString("lugarlaboral"));
-        MiBundleRegreso.putString("Modelo",BundleRegreso.getString("modelo"));
-        MiBundleRegreso.putString("cedulapasajero",BundleRegreso.getString("cedulapasajero"));
+        Bundle MiBundle2=new Bundle();
 
-        MiIntent.putExtras(MiBundleRegreso);
+        MiBundle2.putString("edad",MiBundle.getString("edad"));
+        MiBundle2.putString("genero",MiBundle.getString("genero"));
+        MiBundle2.putString("LugarLaboral",MiBundle.getString("LugarLaboral"));
+        MiBundle2.putString("modelo",MiBundle.getString("modelo"));
+
+        MiIntent.putExtras(MiBundle2);
 
         startActivity(MiIntent);
         finish();
