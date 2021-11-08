@@ -82,8 +82,8 @@ public class ResultadoBusquedaActivity extends AppCompatActivity {
         listaInformacion = new ArrayList<String>();
 
 
-        ConsultarConductores(edad,genero,LugarLaboral,modelo);
 
+        ConsultarConductores(edad,genero,LugarLaboral,modelo);
 
 
 

@@ -74,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
                                    MiBundle.putString("Uid",Auth.getCurrentUser().getUid());
 
 
+
                                    MiIntent.putExtras(MiBundle);
 
                                    startActivity(MiIntent);

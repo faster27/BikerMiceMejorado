@@ -37,7 +37,7 @@ public class InformacionConductorActivity extends AppCompatActivity {
     DatabaseReference db;
     TextView CampoNombre,CampoCedula,CampoEstadocivil,CampoGenero,CampoEdad,CampoResidencia,CampoDiasLaborales,CampoLugarLaboral;
     TextView CampoMarca,CampoPlaca,CampoModelo,CampoImplementos;
-
+    Bundle Informacion;
 
 
 
@@ -51,7 +51,7 @@ public class InformacionConductorActivity extends AppCompatActivity {
 
         Auth=FirebaseAuth.getInstance();
         db=FirebaseDatabase.getInstance().getReference();
-        LlenarLista(Auth.getCurrentUser().getUid().toString());
+
 
     //    ListaInformacion.setAdapter(new Adaptador(this,InfoConductor));
 
@@ -71,41 +71,58 @@ public class InformacionConductorActivity extends AppCompatActivity {
         CampoPlaca=findViewById(R.id.textViewPlaca);
         CampoImplementos=findViewById(R.id.textViewImplementosVehiculo);
 
+        Informacion = this.getIntent().getExtras();
+
+
+
+        if(Informacion==null){
+
+            String vacio ="N";
+
+            LlenarLista(Auth.getCurrentUser().getUid().toString(),vacio);
+
+
+        }else{
+
+            String cedulaConductor = Informacion.getString("cedula");
+
+
+            LlenarLista(Auth.getCurrentUser().getUid().toString(),cedulaConductor);
+
+        }
 
 
 
 
     }
 
-    private void LlenarLista(String Uid) {
+    private void LlenarLista(String Uid,String señal) {
 
-        final String[] nombreConductor = new String[1];
-        final String[] cedulaConductor = new String[1];
-
-
-        db.child("Conductores").child(Uid).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-
-                if(snapshot.exists()){
+        if(señal==null){
+            final String[] nombreConductor = new String[1];
+            final String[] cedulaConductor = new String[1];
 
 
-                    CampoNombre.setText(snapshot.child("nombre").getValue().toString());
-                    CampoCedula.setText(snapshot.child("cedula").getValue().toString());
-                    CampoEdad.setText(snapshot.child("edad").getValue().toString());
-                    CampoGenero.setText(snapshot.child("genero").getValue().toString());
-                    CampoEstadocivil.setText("Estado civil: "+ snapshot.child("estadocivil").getValue().toString());
-                    CampoLugarLaboral.setText(snapshot.child("laboral").getValue().toString());
-                    CampoResidencia.setText(snapshot.child("residencia").getValue().toString());
-                    CampoDiasLaborales.setText(snapshot.child("diaslaborales").getValue().toString());
+            db.child("Conductores").child(Uid).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
 
-                    CampoModelo.setText(snapshot.child("modelo").getValue().toString());
-                    CampoMarca.setText(snapshot.child("marca").getValue().toString());
-                    CampoPlaca.setText(snapshot.child("placa").getValue().toString());
-                    CampoImplementos.setText(snapshot.child("implementos").getValue().toString());
+                    if(snapshot.exists()){
 
 
+                        CampoNombre.setText("Nombre: "+ snapshot.child("nombre").getValue().toString());
+                        CampoCedula.setText("Cedula: "+ snapshot.child("cedula").getValue().toString());
+                        CampoEdad.setText("Edad: "+ snapshot.child("edad").getValue().toString());
+                        CampoGenero.setText("Genero: "+ snapshot.child("genero").getValue().toString());
+                        CampoEstadocivil.setText("Estoy: "+ snapshot.child("estadocivil").getValue().toString());
+                        CampoLugarLaboral.setText("Trabajo en: "+ snapshot.child("laboral").getValue().toString());
+                        CampoResidencia.setText("Vivo en: "+ snapshot.child("residencia").getValue().toString());
+                        CampoDiasLaborales.setText("Trabajo:\n"+ snapshot.child("diaslaborales").getValue().toString());
 
+                        CampoModelo.setText("Modelo: "+ snapshot.child("modelo").getValue().toString());
+                        CampoMarca.setText("Marca: "+ snapshot.child("marca").getValue().toString());
+                        CampoPlaca.setText("Placa: "+ snapshot.child("placa").getValue().toString());
+                        CampoImplementos.setText("Le ofrezco: "+ snapshot.child("implementos").getValue().toString());
 
 
 
@@ -113,16 +130,84 @@ public class InformacionConductorActivity extends AppCompatActivity {
 
 
 
+
+
+
+
+                    }
 
                 }
 
-            }
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+                }
+            });
 
-            }
-        });
+        }else{
+
+            final String[] nombreConductor = new String[1];
+            final String[] cedulaConductor = new String[1];
+
+
+            db.child("Conductores").orderByChild("cedula").equalTo(señal).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                    if(snapshot.exists()){
+
+                        for (DataSnapshot ds : snapshot.getChildren()){
+
+                            CampoNombre.setText("Nombre: "+ ds.child("nombre").getValue().toString());
+                            CampoCedula.setText("Cedula: "+ ds.child("cedula").getValue().toString());
+                            CampoEdad.setText("Edad: "+ ds.child("edad").getValue().toString());
+                            CampoGenero.setText("Genero: "+ ds.child("genero").getValue().toString());
+                            CampoEstadocivil.setText("Estoy: "+ ds.child("estadocivil").getValue().toString());
+                            CampoLugarLaboral.setText("Trabajo en: "+ ds.child("laboral").getValue().toString());
+                            CampoResidencia.setText("Vivo en: "+ ds.child("residencia").getValue().toString());
+                            CampoDiasLaborales.setText("Trabajo:\n"+ ds.child("diaslaborales").getValue().toString());
+
+                            CampoModelo.setText("Modelo: "+ ds.child("modelo").getValue().toString());
+                            CampoMarca.setText("Marca: "+ ds.child("marca").getValue().toString());
+                            CampoPlaca.setText("Placa: "+ ds.child("placa").getValue().toString());
+                            CampoImplementos.setText("Le ofrezco: "+ ds.child("implementos").getValue().toString());
+
+
+
+
+                        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                    }
+
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+
+
+
+
+
+
+        }
+
+
 
 
 
@@ -166,15 +251,11 @@ public class InformacionConductorActivity extends AppCompatActivity {
 
     public void onClickRegresarAConductor(View view) {
 
-        Bundle MiBundle = this.getIntent().getExtras();
 
-        String cedulaConductor =MiBundle.getString("cedulaConductor");
-        String señal =MiBundle.getString("señal");
-        String edad = MiBundle.getString("edad");
-        String genero = MiBundle.getString("genero");
-        String LugarLaboral = MiBundle.getString("LugarLaboral");
-        String Modelo = MiBundle.getString("Modelo");
-        String cedulapasajero = MiBundle.getString("cedulapasajero");
+        String cedulaConductor =Informacion.getString("cedula");
+        String señaldevolver=Informacion.getString("señaldevolver");
+
+
 
 
 
@@ -184,12 +265,11 @@ public class InformacionConductorActivity extends AppCompatActivity {
         Bundle MiBundleRegreso = new Bundle();
 
         MiBundleRegreso.putString("cedula",cedulaConductor);
-        MiBundleRegreso.putString("señal",señal);
-        MiBundleRegreso.putString("edad",edad);
-        MiBundleRegreso.putString("genero",genero);
-        MiBundleRegreso.putString("lugarlaboral",LugarLaboral);
-        MiBundleRegreso.putString("modelo",Modelo);
-        MiBundleRegreso.putString("cedulapasajero",cedulapasajero);
+        MiBundleRegreso.putString("señal",señaldevolver);
+        MiBundleRegreso.putString("edad",Informacion.getString("edad"));
+        MiBundleRegreso.putString("genero",Informacion.getString("genero"));
+        MiBundleRegreso.putString("LugarLaboral",Informacion.getString("LugarLaboral"));
+        MiBundleRegreso.putString("modelo",Informacion.getString("modelo"));
 
         MiIntent.putExtras(MiBundleRegreso);
         startActivity(MiIntent);

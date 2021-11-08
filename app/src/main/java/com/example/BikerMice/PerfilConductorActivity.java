@@ -13,6 +13,8 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -180,12 +182,8 @@ public class PerfilConductorActivity extends AppCompatActivity {
         final String[] nombre = new String[1];
 
 
-
-
         //AQUI SE ARMA LA VISTA DESDE PASAJERO
         if(señal.equals(comparacion)){
-
-
 
             db.child("Conductores").orderByChild("cedula").equalTo(cedula).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
@@ -228,6 +226,7 @@ public class PerfilConductorActivity extends AppCompatActivity {
         //AQUI SE ARMA LA VISTA DESDE CONDUCTOR
         if(señal.equals(comparacion2)){
 
+            Uid= Auth.getCurrentUser().getUid().toString();
 
             db.child("Conductores").child(Uid).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
@@ -333,8 +332,20 @@ public class PerfilConductorActivity extends AppCompatActivity {
 
     public void onClickMasInformacion(View view) {
 
+        Bundle Informacion = new Bundle();
+
+
+        Informacion.putString("cedula",cedula);
+        Informacion.putString("señaldevolver",señal);
+        Informacion.putString("edad",MiBundle.getString("edad"));
+        Informacion.putString("genero",MiBundle.getString("genero"));
+        Informacion.putString("LugarLaboral",MiBundle.getString("LugarLaboral"));
+        Informacion.putString("modelo",MiBundle.getString("modelo"));
+
+
 
         Intent MiIntent = new Intent(getApplicationContext(),InformacionConductorActivity.class);
+        MiIntent.putExtras(Informacion);
         startActivity(MiIntent);
         finish();
 
