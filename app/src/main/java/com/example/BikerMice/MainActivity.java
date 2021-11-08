@@ -86,6 +86,7 @@ public class MainActivity extends AppCompatActivity {
 
                                    Bundle MiBundle=new Bundle();
                                    MiBundle.putString("Uid",Auth.getCurrentUser().getUid());
+
                                    MiBundle.putString("señal","2");
 
 
