@@ -8,9 +8,11 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -104,8 +106,8 @@ public class PerfilConductorActivity extends AppCompatActivity {
             @Override
             public void onRatingChanged(RatingBar ratingBar, float rating, boolean b) {
 
-              //  Calificar(cedulaConductor,rating);
-               // SetearPuntaje(cedulaConductor);
+              Calificar(cedula,rating);
+
 
             }
         });
@@ -124,19 +126,40 @@ public class PerfilConductorActivity extends AppCompatActivity {
     private void Calificar(String cedulaConductor, float rating) {
 
 
-        ConexionSQLiteHelper conn = new ConexionSQLiteHelper(this,"dbBikerMice2",null,1);
 
-        SQLiteDatabase db = conn.getWritableDatabase();
-
-        ContentValues values = new ContentValues();
-
-        values.put(Utilidades.CAMPO_CEDULA_CONDUCTOR,cedulaConductor);
-        values.put(Utilidades.CAMPO_PUNTAJE,rating);
-
-        db.insert(Utilidades.TABLA_PUNTAJE,Utilidades.CAMPO_CEDULA_CONDUCTOR,values);
+        Map<String,Object> map =new HashMap<>();
 
 
-        db.close();
+        map.put("cedula",cedulaConductor);
+        map.put("rating",rating);
+
+
+
+        db.child("Calificacion").push().setValue(map).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+
+                if(task.isSuccessful()){
+
+                    SetearPuntaje(cedulaConductor);
+
+
+                }else{
+
+                    //  Toast.makeText(getApplicationContext(), "Registro fallido", Toast.LENGTH_SHORT).show();
+
+                }
+
+            }
+        });
+
+
+
+
+
+
+
+
 
 
         Toast.makeText(getApplicationContext(),"Calificacion guardada",Toast.LENGTH_SHORT).show();
@@ -149,33 +172,54 @@ public class PerfilConductorActivity extends AppCompatActivity {
     private void SetearPuntaje(String cedulaConductor) {
 
 
+        db.child("Calificacion").orderByChild("cedula").equalTo(cedulaConductor).addListenerForSingleValueEvent(new ValueEventListener() {
+            @RequiresApi(api = Build.VERSION_CODES.N)
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
 
-        conn = new ConexionSQLiteHelper(getApplicationContext(),"dbBikerMice2",null,1);
+                    double TotalCalificacion= (double) snapshot.getChildrenCount();
 
-        SQLiteDatabase db = conn.getReadableDatabase();
+                    int SumaCalificacion=0;
 
-        String ConsultaSQL = "select AVG(puntaje) from " + Utilidades.TABLA_PUNTAJE + " where cedula_conductor = '"+cedulaConductor+"'";
+                    for (DataSnapshot ds : snapshot.getChildren()){
+
+                       Long valor = (Long) ds.child("rating").getValue();
+
+                       SumaCalificacion= (int) (SumaCalificacion + valor);
+
+                    }
+
+                    double promedio= SumaCalificacion/TotalCalificacion;
+
+                    String casteo = String.valueOf(promedio);
+                    String calificacionFinal=casteo.substring(0,3);
 
 
-        Cursor cursor = db.rawQuery(ConsultaSQL, null);
-
-        cursor.moveToFirst();
-
-        float CantidadPuntaje=cursor.getFloat(0);
-        String casteo = String.valueOf(CantidadPuntaje);
-        String cadena2=casteo.substring(0,3);
-
-
-
-
-
-        Calificacion.setText(cadena2);
-
+                    Calificacion.setText(calificacionFinal);
 
 
 
-       cursor.close();
-       db.close();
+
+
+
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+
+
+
+
+
+
+
 
 
 
@@ -227,6 +271,7 @@ public class PerfilConductorActivity extends AppCompatActivity {
             });
 
             MostrarComentario(cedula);
+            SetearPuntaje(cedula);
 
         }
 
@@ -254,6 +299,7 @@ public class PerfilConductorActivity extends AppCompatActivity {
                         Llamar.setVisibility(View.INVISIBLE);
                         BarraCalificacion.setVisibility(View.INVISIBLE);
                         MostrarComentario(cedulaComentarios[0]);
+                        SetearPuntaje(cedulaComentarios[0]);
 
                     }
 
