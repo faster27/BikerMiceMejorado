@@ -31,8 +31,11 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.auth.SignInMethodQueryResult;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -345,63 +348,115 @@ public class RegistroPasajerosActivity extends AppCompatActivity {
 
             )  {
 
-
-
             if(campoPassword.getText().toString().length()>=6){
 
-                Auth.createUserWithEmailAndPassword(campoEmail.getText().toString(),campoPassword.getText().toString()).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                FirebaseAuth.getInstance().fetchSignInMethodsForEmail(campoEmail.getText().toString()).addOnCompleteListener(new OnCompleteListener<SignInMethodQueryResult>() {
                     @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
+                    public void onComplete(@NonNull Task<SignInMethodQueryResult> task) {
 
                         if(task.isSuccessful()){
 
+                            boolean check =!task.getResult().getSignInMethods().isEmpty();
 
-                            Map<String,Object> map =new HashMap<>();
+                            if (check){
 
-                            map.put("email",campoEmail.getText().toString());
-                            map.put("contrasena",campoPassword.getText().toString());
-                            map.put("nombre",campoNombre.getText().toString());
-                            map.put("cedula",campoCedula.getText().toString());
-                            map.put("edad",campoEdad.getText().toString());
-                            map.put("genero",GeneroPasajero);
-                            map.put("residencia",LugarResidencia);
+                                Map<String,Object> map =new HashMap<>();
 
-
-                            String id = Auth.getCurrentUser().getUid();
-
-                            database.child("Users").child(id).setValue(map).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                @Override
-                                public void onComplete(@NonNull Task<Void> task2) {
-                                    if(task2.isSuccessful()){
-
-                                        Toast.makeText(getApplicationContext(), "Usuario registrado con exito", Toast.LENGTH_SHORT).show();
-
-                                        Intent MyIntent = new Intent(getApplicationContext(),MainActivity.class);
-                                        startActivity(MyIntent);
-                                        finish();
+                                map.put("email",campoEmail.getText().toString());
+                                map.put("contrasena",campoPassword.getText().toString());
+                                map.put("nombre",campoNombre.getText().toString());
+                                map.put("cedula",campoCedula.getText().toString());
+                                map.put("edad",campoEdad.getText().toString());
+                                map.put("genero",GeneroPasajero);
+                                map.put("residencia",LugarResidencia);
 
 
+                                String id = Auth.getCurrentUser().getUid();
 
-                                    }else{
+                                database.child("Users").child(id).setValue(map).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task2) {
+                                        if(task2.isSuccessful()){
 
-                                        Toast.makeText(getApplicationContext(), "Registro fallido", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(getApplicationContext(), "Usuario registrado con exito", Toast.LENGTH_SHORT).show();
+
+                                            Intent MyIntent = new Intent(getApplicationContext(),MainActivity.class);
+                                            startActivity(MyIntent);
+                                            finish();
+
+
+
+                                        }else{
+
+                                            Toast.makeText(getApplicationContext(), "Registro fallido", Toast.LENGTH_SHORT).show();
+
+                                        }
+                                    }
+                                });
+
+
+                            }else{
+
+                                Auth.createUserWithEmailAndPassword(campoEmail.getText().toString(),campoPassword.getText().toString()).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<AuthResult> task) {
+
+                                        if(task.isSuccessful()){
+
+                                            Map<String,Object> map =new HashMap<>();
+
+                                            map.put("email",campoEmail.getText().toString());
+                                            map.put("contrasena",campoPassword.getText().toString());
+                                            map.put("nombre",campoNombre.getText().toString());
+                                            map.put("cedula",campoCedula.getText().toString());
+                                            map.put("edad",campoEdad.getText().toString());
+                                            map.put("genero",GeneroPasajero);
+                                            map.put("residencia",LugarResidencia);
+
+
+                                            String id = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+                                            database.child("Users").child(id).setValue(map).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<Void> task2) {
+                                                    if(task2.isSuccessful()){
+
+                                                        Toast.makeText(getApplicationContext(), "Usuario registrado con exito", Toast.LENGTH_SHORT).show();
+
+                                                        Intent MyIntent = new Intent(getApplicationContext(),MainActivity.class);
+                                                        startActivity(MyIntent);
+                                                        finish();
+
+
+
+                                                    }else{
+
+                                                        Toast.makeText(getApplicationContext(), "Registro fallido", Toast.LENGTH_SHORT).show();
+
+                                                    }
+                                                }
+                                            });
+
+
+                                        }
 
                                     }
-                                }
-                            });
+                                });
 
 
-                        }else{
+                            }
 
-                            Toast.makeText(getApplicationContext(), "No se pudo registar el usuario", Toast.LENGTH_SHORT).show();
 
                         }
 
+                    }
+                });
 
 
 
-                                }
-                            });
+
+
+
 
                         }else {
 

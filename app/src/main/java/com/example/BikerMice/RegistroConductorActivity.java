@@ -33,6 +33,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.SignInMethodQueryResult;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -979,65 +980,134 @@ public class RegistroConductorActivity extends AppCompatActivity {
         ){
             if(campoPassword.getText().toString().length()>=6) {
 
-                Auth.createUserWithEmailAndPassword(campoEmail.getText().toString(),campoPassword.getText().toString()).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+
+                FirebaseAuth.getInstance().fetchSignInMethodsForEmail(campoEmail.getText().toString()).addOnCompleteListener(new OnCompleteListener<SignInMethodQueryResult>() {
                     @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
+                    public void onComplete(@NonNull Task<SignInMethodQueryResult> task) {
 
                         if(task.isSuccessful()){
 
-                            Map<String,Object> map =new HashMap<>();
+                            boolean check =!task.getResult().getSignInMethods().isEmpty();
 
-                            map.put("email",campoEmail.getText().toString());
-                            map.put("contrasena",campoPassword.getText().toString());
-                            map.put("cedula",campoCedula.getText().toString());
-                            map.put("nombre",campoNombre.getText().toString());
-                            map.put("genero",generoConductor);
-                            map.put("edad",campoEdad.getText().toString());
-                            map.put("telefono",campotelefono.getText().toString());
-                            map.put("estadocivil",EstadoCivil);
-                            map.put("residencia",LugarResidencia);
-                            map.put("laboral",LugarLaboral);
-                            map.put("modelo",campoModelo.getText().toString());
-                            map.put("marca",campoMarca.getText().toString());
-                            map.put("placa",campoPlaca.getText().toString());
-                            map.put("diaslaborales",DiasLaborales2) ;
-                            map.put("implementos",campoImplementos.getText().toString()) ;
+                            if(check){
+                                Map<String,Object> map =new HashMap<>();
 
-                            String id = Auth.getCurrentUser().getUid();
+                                map.put("email",campoEmail.getText().toString());
+                                map.put("contrasena",campoPassword.getText().toString());
+                                map.put("cedula",campoCedula.getText().toString());
+                                map.put("nombre",campoNombre.getText().toString());
+                                map.put("genero",generoConductor);
+                                map.put("edad",campoEdad.getText().toString());
+                                map.put("telefono",campotelefono.getText().toString());
+                                map.put("estadocivil",EstadoCivil);
+                                map.put("residencia",LugarResidencia);
+                                map.put("laboral",LugarLaboral);
+                                map.put("modelo",campoModelo.getText().toString());
+                                map.put("marca",campoMarca.getText().toString());
+                                map.put("placa",campoPlaca.getText().toString());
+                                map.put("diaslaborales",DiasLaborales2) ;
+                                map.put("implementos",campoImplementos.getText().toString()) ;
 
-                            database.child("Conductores").child(id).setValue(map).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                @Override
-                                public void onComplete(@NonNull Task<Void> task2) {
+                                String id = Auth.getCurrentUser().getUid();
 
-                                    if(task2.isSuccessful()){
+                                database.child("Conductores").child(id).setValue(map).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task2) {
 
-                                        Toast.makeText(getApplicationContext(), "Usuario registrado con exito", Toast.LENGTH_SHORT).show();
+                                        if(task2.isSuccessful()){
 
-                                        Intent MyIntent = new Intent(getApplicationContext(),MainActivity.class);
-                                        startActivity(MyIntent);
-                                        finish();
+                                            Toast.makeText(getApplicationContext(), "Usuario registrado con exito", Toast.LENGTH_SHORT).show();
+
+                                            Intent MyIntent = new Intent(getApplicationContext(),MainActivity.class);
+                                            startActivity(MyIntent);
+                                            finish();
 
 
-                                    }else{
+                                        }else{
 
-                                        Toast.makeText(getApplicationContext(), "Registro fallido", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(getApplicationContext(), "Registro fallido", Toast.LENGTH_SHORT).show();
+
+
+                                        }
+
 
 
                                     }
+                                });
+
+
+                            }else{
+                                Auth.createUserWithEmailAndPassword(campoEmail.getText().toString(),campoPassword.getText().toString()).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<AuthResult> task) {
+
+                                        if(task.isSuccessful()){
+
+                                            Map<String,Object> map =new HashMap<>();
+
+                                            map.put("email",campoEmail.getText().toString());
+                                            map.put("contrasena",campoPassword.getText().toString());
+                                            map.put("cedula",campoCedula.getText().toString());
+                                            map.put("nombre",campoNombre.getText().toString());
+                                            map.put("genero",generoConductor);
+                                            map.put("edad",campoEdad.getText().toString());
+                                            map.put("telefono",campotelefono.getText().toString());
+                                            map.put("estadocivil",EstadoCivil);
+                                            map.put("residencia",LugarResidencia);
+                                            map.put("laboral",LugarLaboral);
+                                            map.put("modelo",campoModelo.getText().toString());
+                                            map.put("marca",campoMarca.getText().toString());
+                                            map.put("placa",campoPlaca.getText().toString());
+                                            map.put("diaslaborales",DiasLaborales2) ;
+                                            map.put("implementos",campoImplementos.getText().toString()) ;
+
+                                            String id = Auth.getCurrentUser().getUid();
+
+                                            database.child("Conductores").child(id).setValue(map).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<Void> task2) {
+
+                                                    if(task2.isSuccessful()){
+
+                                                        Toast.makeText(getApplicationContext(), "Usuario registrado con exito", Toast.LENGTH_SHORT).show();
+
+                                                        Intent MyIntent = new Intent(getApplicationContext(),MainActivity.class);
+                                                        startActivity(MyIntent);
+                                                        finish();
+
+
+                                                    }else{
+
+                                                        Toast.makeText(getApplicationContext(), "Registro fallido", Toast.LENGTH_SHORT).show();
+
+
+                                                    }
 
 
 
-                                }
-                            });
+                                                }
+                                            });
 
-                        }else{
+                                        }else{
 
-                            Toast.makeText(getApplicationContext(), "No se pudo registar el usuario", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(getApplicationContext(), "No se pudo registar el usuario", Toast.LENGTH_SHORT).show();
+
+                                        }
+
+                                    }
+                                });
+
+
+                            }
+
 
                         }
 
                     }
                 });
+
+
+
 
 
             }else{

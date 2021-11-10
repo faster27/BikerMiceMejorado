@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "446302091698",
+    "firebase_url": "https://bikermice-5a9b7-default-rtdb.firebaseio.com",
     "project_id": "bikermice-5a9b7",
     "storage_bucket": "bikermice-5a9b7.appspot.com"
   },
@@ -13,6 +14,14 @@
         }
       },
       "oauth_client": [
+        {
+          "client_id": "446302091698-mndlsverlhu41fqk5eo3j517mpqh9gn4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.BikerMice",
+            "certificate_hash": "b969f05b284cdc7d305ec8b5723a39872d01dbec"
+          }
+        },
         {
           "client_id": "446302091698-7fg5i8q4895c13pf3efetqf9bdumbfof.apps.googleusercontent.com",
           "client_type": 3
