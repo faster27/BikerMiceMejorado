@@ -52,6 +52,7 @@ import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -365,9 +366,16 @@ public class RegistroPasajerosActivity extends AppCompatActivity {
 
             if(campoPassword.getText().toString().length()>=6){
 
+
+
+
+                ///AQUI YA SE GUARDA EL PASAJERO Y SE LE PASA EL LINK DE LA FOTO
                 FirebaseAuth.getInstance().fetchSignInMethodsForEmail(campoEmail.getText().toString()).addOnCompleteListener(new OnCompleteListener<SignInMethodQueryResult>() {
                     @Override
                     public void onComplete(@NonNull Task<SignInMethodQueryResult> task) {
+
+
+                        /* TODO DEBERIA QUEDAR DETO DESPUES DE GUARDR LA IMAGEN PARA QUE FUNCIONES */
 
                         if(task.isSuccessful()){
 
@@ -375,93 +383,137 @@ public class RegistroPasajerosActivity extends AppCompatActivity {
 
                             if (check){
 
-                                Map<String,Object> map =new HashMap<>();
+                                StorageReference folderRef = storageReference.child("fotosPasajeros");
+                                StorageReference fotoRef = folderRef.child(new Date().toString());
 
-                                map.put("email",campoEmail.getText().toString());
-                                map.put("contrasena",campoPassword.getText().toString());
-                                map.put("nombre",campoNombre.getText().toString());
-                                map.put("cedula",campoCedula.getText().toString());
-                                map.put("edad",campoEdad.getText().toString());
-                                map.put("genero",GeneroPasajero);
-                                map.put("residencia",LugarResidencia);
-
-
-
-
-
-                                String id = Auth.getCurrentUser().getUid();
-
-                                database.child("Users").child(id).setValue(map).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                fotoRef.putFile(path).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                    Uri downloadUri;
                                     @Override
-                                    public void onComplete(@NonNull Task<Void> task2) {
-                                        if(task2.isSuccessful()){
+                                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                        Task<Uri> uriTask =taskSnapshot.getStorage().getDownloadUrl();
+                                        while(!uriTask.isSuccessful());
+                                        downloadUri =uriTask.getResult();
 
-                                            Toast.makeText(getApplicationContext(), "Usuario registrado con exito", Toast.LENGTH_SHORT).show();
+                                        Log.e("TAG",downloadUri.toString());
 
-                                            Intent MyIntent = new Intent(getApplicationContext(),MainActivity.class);
-                                            startActivity(MyIntent);
-                                            finish();
+                                        Map<String,Object> map =new HashMap<>();
 
+                                        map.put("email",campoEmail.getText().toString());
+                                        map.put("contrasena",campoPassword.getText().toString());
+                                        map.put("nombre",campoNombre.getText().toString());
+                                        map.put("cedula",campoCedula.getText().toString());
+                                        map.put("edad",campoEdad.getText().toString());
+                                        map.put("genero",GeneroPasajero);
+                                        map.put("residencia",LugarResidencia);
+                                        map.put("linkfoto",downloadUri.toString());
 
+                                        String id = Auth.getCurrentUser().getUid();
 
-                                        }else{
+                                        database.child("Users").child(id).setValue(map).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task2) {
+                                                if(task2.isSuccessful()){
 
-                                            Toast.makeText(getApplicationContext(), "Registro fallido", Toast.LENGTH_SHORT).show();
+                                                    Toast.makeText(getApplicationContext(), "Usuario registrado con exito", Toast.LENGTH_SHORT).show();
 
-                                        }
-                                    }
-                                });
-
-
-                            }else{
-
-                                Auth.createUserWithEmailAndPassword(campoEmail.getText().toString(),campoPassword.getText().toString()).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<AuthResult> task) {
-
-                                        if(task.isSuccessful()){
-
-                                            Map<String,Object> map =new HashMap<>();
-
-                                            map.put("email",campoEmail.getText().toString());
-                                            map.put("contrasena",campoPassword.getText().toString());
-                                            map.put("nombre",campoNombre.getText().toString());
-                                            map.put("cedula",campoCedula.getText().toString());
-                                            map.put("edad",campoEdad.getText().toString());
-                                            map.put("genero",GeneroPasajero);
-                                            map.put("residencia",LugarResidencia);
+                                                    Intent MyIntent = new Intent(getApplicationContext(),MainActivity.class);
+                                                    startActivity(MyIntent);
+                                                    finish();
 
 
 
+                                                }else{
 
-                                            String id = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                                                    Toast.makeText(getApplicationContext(), "Registro fallido", Toast.LENGTH_SHORT).show();
 
-                                            database.child("Users").child(id).setValue(map).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                @Override
-                                                public void onComplete(@NonNull Task<Void> task2) {
-                                                    if(task2.isSuccessful()){
-
-                                                        Toast.makeText(getApplicationContext(), "Usuario registrado con exito", Toast.LENGTH_SHORT).show();
-
-                                                        Intent MyIntent = new Intent(getApplicationContext(),MainActivity.class);
-                                                        startActivity(MyIntent);
-                                                        finish();
-
-
-
-                                                    }else{
-
-                                                        Toast.makeText(getApplicationContext(), "Registro fallido", Toast.LENGTH_SHORT).show();
-
-                                                    }
                                                 }
-                                            });
+                                            }
+                                        });
 
-
-                                        }
 
                                     }
                                 });
+
+
+
+
+                            }
+
+
+
+                            else{
+
+
+
+                                StorageReference folderRef = storageReference.child("fotosPasajeros");
+                                StorageReference fotoRef = folderRef.child(new Date().toString());
+
+                                fotoRef.putFile(path).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                    Uri downloadUri;
+                                    @Override
+                                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                        Task<Uri> uriTask =taskSnapshot.getStorage().getDownloadUrl();
+                                        while(!uriTask.isSuccessful());
+                                        downloadUri=uriTask.getResult();
+
+                                        Auth.createUserWithEmailAndPassword(campoEmail.getText().toString(),campoPassword.getText().toString()).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<AuthResult> task) {
+
+                                                if(task.isSuccessful()){
+
+                                                    Map<String,Object> map =new HashMap<>();
+
+                                                    map.put("email",campoEmail.getText().toString());
+                                                    map.put("contrasena",campoPassword.getText().toString());
+                                                    map.put("nombre",campoNombre.getText().toString());
+                                                    map.put("cedula",campoCedula.getText().toString());
+                                                    map.put("edad",campoEdad.getText().toString());
+                                                    map.put("genero",GeneroPasajero);
+                                                    map.put("residencia",LugarResidencia);
+                                                    map.put("linkfoto",downloadUri.toString());
+
+
+
+
+
+                                                    String id = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+                                                    database.child("Users").child(id).setValue(map).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                        @Override
+                                                        public void onComplete(@NonNull Task<Void> task2) {
+                                                            if(task2.isSuccessful()){
+
+                                                                Toast.makeText(getApplicationContext(), "Usuario registrado con exito", Toast.LENGTH_SHORT).show();
+
+                                                                Intent MyIntent = new Intent(getApplicationContext(),MainActivity.class);
+                                                                startActivity(MyIntent);
+                                                                finish();
+
+
+
+                                                            }else{
+
+                                                                Toast.makeText(getApplicationContext(), "Registro fallido", Toast.LENGTH_SHORT).show();
+
+                                                            }
+                                                        }
+                                                    });
+
+
+                                                }
+
+                                            }
+                                        });
+
+
+                                    }
+                                });
+
+
+
+
+
 
 
                             }
@@ -469,8 +521,25 @@ public class RegistroPasajerosActivity extends AppCompatActivity {
 
                         }
 
+
+
+
+
+
+
+
                     }
                 });
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -571,13 +640,24 @@ public class RegistroPasajerosActivity extends AppCompatActivity {
 
     }
 
-    private void GuardarFoto(Uri path) {
-        final String[] link2 = new String[1];
+    private Uri GuardarFoto(Uri foto) {
 
-        StorageReference filepath = storageReference.child("foto").child(path.getLastPathSegment());
+        final Uri[] downloadUri = new Uri[1];
+        StorageReference folderRef = storageReference.child("fotosPasajeros");
+        StorageReference fotoRef = folderRef.child(new Date().toString());
+
+        fotoRef.putFile(foto).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                Task<Uri> uriTask =taskSnapshot.getStorage().getDownloadUrl();
+                while(!uriTask.isSuccessful());
+                downloadUri[0] =uriTask.getResult();
 
 
+            }
+        });
 
-
+        Log.e("TAG", downloadUri[0].toString());
+        return downloadUri[0];
     }
 }
