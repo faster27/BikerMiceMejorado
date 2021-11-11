@@ -1,6 +1,7 @@
 package com.example.BikerMice;
 
 
+import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
@@ -16,6 +17,8 @@ import android.provider.MediaStore;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -41,10 +44,18 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+import com.theartofdev.edmodo.cropper.CropImage;
+import com.theartofdev.edmodo.cropper.CropImageView;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+
+import id.zelory.compressor.Compressor;
 
 public class RegistroPasajerosActivity extends AppCompatActivity {
 
@@ -58,6 +69,8 @@ public class RegistroPasajerosActivity extends AppCompatActivity {
     Bundle MiBundle;
     FirebaseAuth Auth;
     DatabaseReference database;
+    StorageReference storageReference;
+    Uri path;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +89,7 @@ public class RegistroPasajerosActivity extends AppCompatActivity {
         campoPassword=findViewById(R.id.textViewPasswordPasajero);
         Auth=FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance().getReference();
+        storageReference= FirebaseStorage.getInstance().getReference();
 
 
          MiBundle = this.getIntent().getExtras();
@@ -335,6 +349,7 @@ public class RegistroPasajerosActivity extends AppCompatActivity {
 
     private void RegistrarUsuarios() {
 
+
         String genero = "Genero";
         String residencia="Lugar de residencia";
 
@@ -369,6 +384,9 @@ public class RegistroPasajerosActivity extends AppCompatActivity {
                                 map.put("edad",campoEdad.getText().toString());
                                 map.put("genero",GeneroPasajero);
                                 map.put("residencia",LugarResidencia);
+
+
+
 
 
                                 String id = Auth.getCurrentUser().getUid();
@@ -412,6 +430,8 @@ public class RegistroPasajerosActivity extends AppCompatActivity {
                                             map.put("edad",campoEdad.getText().toString());
                                             map.put("genero",GeneroPasajero);
                                             map.put("residencia",LugarResidencia);
+
+
 
 
                                             String id = FirebaseAuth.getInstance().getCurrentUser().getUid();
@@ -477,6 +497,9 @@ public class RegistroPasajerosActivity extends AppCompatActivity {
 
     }
 
+
+
+
     private byte[] CrearBit() {
 
         byte[] bytesImage = new byte[0];
@@ -527,10 +550,10 @@ public class RegistroPasajerosActivity extends AppCompatActivity {
 
 
 
-            Intent MiIntent =new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-            MiIntent.setType("image/");
+          Intent MiIntent =new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+           MiIntent.setType("image/");
 
-            startActivityForResult(MiIntent.createChooser(MiIntent,"Seleccione la aplicación"),10);
+         startActivityForResult(MiIntent.createChooser(MiIntent,"Seleccione la aplicación"),10);
 
 
     }
@@ -540,8 +563,20 @@ public class RegistroPasajerosActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
 
-            Uri path=data.getData();
-            ImagenPasajero.setImageURI(path);
+        path=data.getData();
+
+        ImagenPasajero.setImageURI(path);
+
+
+
+    }
+
+    private void GuardarFoto(Uri path) {
+        final String[] link2 = new String[1];
+
+        StorageReference filepath = storageReference.child("foto").child(path.getLastPathSegment());
+
+
 
 
     }
