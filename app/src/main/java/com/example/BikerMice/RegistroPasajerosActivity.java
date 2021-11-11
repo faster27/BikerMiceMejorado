@@ -2,6 +2,7 @@ package com.example.BikerMice;
 
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
@@ -29,6 +30,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.BikerMice.utilidades.Utilidades;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -72,6 +74,7 @@ public class RegistroPasajerosActivity extends AppCompatActivity {
     DatabaseReference database;
     StorageReference storageReference;
     Uri path;
+    private ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,6 +94,7 @@ public class RegistroPasajerosActivity extends AppCompatActivity {
         Auth=FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance().getReference();
         storageReference= FirebaseStorage.getInstance().getReference();
+        progressDialog = new ProgressDialog(this);
 
 
          MiBundle = this.getIntent().getExtras();
@@ -168,6 +172,8 @@ public class RegistroPasajerosActivity extends AppCompatActivity {
                     String edad=snapshot.child("edad").getValue().toString();
                     String genero=snapshot.child("genero").getValue().toString();
                     String residencia=snapshot.child("residencia").getValue().toString();
+                    String LinkFoto = snapshot.child("linkfoto").getValue().toString();
+                    Glide.with(RegistroPasajerosActivity.this).load(LinkFoto).into(ImagenPasajero);
 
 
                     //SE SETEA EL CAMPO EMAIL
@@ -273,6 +279,12 @@ public class RegistroPasajerosActivity extends AppCompatActivity {
 
     private void ActualizarPerfil() {
 
+        progressDialog.setTitle("Actualizando...");
+        progressDialog.setMessage("Actualizando Perfil");
+        progressDialog.setCancelable(false);
+        
+        progressDialog.show();
+
         String genero = "Genero";
         String residencia="Lugar de residencia";
 
@@ -289,41 +301,149 @@ public class RegistroPasajerosActivity extends AppCompatActivity {
 
             if(campoPassword.getText().toString().length()>=6){
 
-                Map<String,Object> UsuarioMap = new HashMap<>();
+                if(path ==null){
 
-                UsuarioMap.put("email",campoEmail.getText().toString());
-                UsuarioMap.put("contrasena",campoPassword.getText().toString());
-                UsuarioMap.put("nombre",campoNombre.getText().toString());
-                UsuarioMap.put("cedula",campoCedula.getText().toString());
-                UsuarioMap.put("genero",GeneroPasajero);
-                UsuarioMap.put("residencia",LugarResidencia);
+                    Map<String,Object> UsuarioMap = new HashMap<>();
 
-                database.child("Users").child(Auth.getCurrentUser().getUid().toString()).updateChildren(UsuarioMap).addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void unused) {
+                    UsuarioMap.put("email",campoEmail.getText().toString());
+                    UsuarioMap.put("contrasena",campoPassword.getText().toString());
+                    UsuarioMap.put("nombre",campoNombre.getText().toString());
+                    UsuarioMap.put("cedula",campoCedula.getText().toString());
+                    UsuarioMap.put("genero",GeneroPasajero);
+                    UsuarioMap.put("residencia",LugarResidencia);
 
-                        Toast.makeText(getApplicationContext(), "Usuario Actualizado con exito", Toast.LENGTH_SHORT).show();
+                    database.child("Users").child(Auth.getCurrentUser().getUid().toString()).updateChildren(UsuarioMap).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void unused) {
 
-                        Intent MiIntent = new Intent(getApplicationContext(),PerfilPasajeroActivity.class);
+                            Toast.makeText(getApplicationContext(), "Usuario Actualizado con exito", Toast.LENGTH_SHORT).show();
 
-                        Bundle MiBundle=new Bundle();
-                        MiBundle.putString("Uid",Auth.getCurrentUser().getUid());
+                            Intent MiIntent = new Intent(getApplicationContext(),PerfilPasajeroActivity.class);
 
-                        MiIntent.putExtras(MiBundle);
+                            Bundle MiBundle=new Bundle();
+                            MiBundle.putString("Uid",Auth.getCurrentUser().getUid());
 
-                        startActivity(MiIntent);
-                        finish();
+                            MiIntent.putExtras(MiBundle);
 
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
+                            progressDialog.dismiss();
 
-                        Toast.makeText(getApplicationContext(), "Actualizacion fallida", Toast.LENGTH_SHORT).show();
+                            startActivity(MiIntent);
+                            finish();
+
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+
+                            Toast.makeText(getApplicationContext(), "Actualizacion fallida", Toast.LENGTH_SHORT).show();
 
 
-                    }
-                });
+                        }
+                    });
+
+                }
+
+
+                else{
+
+
+                    StorageReference folderRef = storageReference.child("fotosPasajeros");
+                    StorageReference fotoRef = folderRef.child(new Date().toString());
+
+                    database.child("Users").child(Auth.getCurrentUser().getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                            if(snapshot.exists()){
+
+
+                                String linkfoto=snapshot.child("linkfoto").getValue().toString();
+
+                                StorageReference photoRef=folderRef.getStorage().getReferenceFromUrl(linkfoto);
+
+                                photoRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+
+                                    }
+                                }).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception exception) {
+                                        // Uh-oh, an error occurred!
+
+                                    }
+                                });
+
+
+
+                            }
+
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+
+                        }
+                    });
+
+
+
+                    fotoRef.putFile(path).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        Uri downloadUri;
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            Task<Uri> uriTask =taskSnapshot.getStorage().getDownloadUrl();
+                            while(!uriTask.isSuccessful());
+                            downloadUri=uriTask.getResult();
+
+                            Map<String,Object> UsuarioMap = new HashMap<>();
+
+                            UsuarioMap.put("email",campoEmail.getText().toString());
+                            UsuarioMap.put("contrasena",campoPassword.getText().toString());
+                            UsuarioMap.put("nombre",campoNombre.getText().toString());
+                            UsuarioMap.put("cedula",campoCedula.getText().toString());
+                            UsuarioMap.put("genero",GeneroPasajero);
+                            UsuarioMap.put("residencia",LugarResidencia);
+                            UsuarioMap.put("linkfoto",downloadUri.toString());
+
+                            database.child("Users").child(Auth.getCurrentUser().getUid().toString()).updateChildren(UsuarioMap).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void unused) {
+
+                                    Toast.makeText(getApplicationContext(), "Usuario Actualizado con exito", Toast.LENGTH_SHORT).show();
+
+                                    Intent MiIntent = new Intent(getApplicationContext(),PerfilPasajeroActivity.class);
+
+                                    Bundle MiBundle=new Bundle();
+                                    MiBundle.putString("Uid",Auth.getCurrentUser().getUid());
+
+                                    MiIntent.putExtras(MiBundle);
+                                    progressDialog.dismiss();
+
+                                    startActivity(MiIntent);
+                                    finish();
+
+                                }
+                            }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+
+                                    Toast.makeText(getApplicationContext(), "Actualizacion fallida", Toast.LENGTH_SHORT).show();
+
+
+                                }
+                            });
+
+
+                        }
+                    });
+
+
+                }
+
+
+
+
+
 
 
 

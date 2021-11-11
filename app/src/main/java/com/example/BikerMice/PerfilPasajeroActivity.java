@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -21,6 +22,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -124,6 +126,8 @@ public class PerfilPasajeroActivity extends AppCompatActivity {
 
 
                     String nombre=snapshot.child("nombre").getValue().toString();
+                    String LinkFoto = snapshot.child("linkfoto").getValue().toString();
+                    Glide.with(PerfilPasajeroActivity.this).load(LinkFoto).into(FotoPasajero);
                     NombreBienvenida.setText(nombre);
 
                 }
