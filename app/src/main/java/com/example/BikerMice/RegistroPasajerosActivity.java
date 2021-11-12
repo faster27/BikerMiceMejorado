@@ -282,7 +282,7 @@ public class RegistroPasajerosActivity extends AppCompatActivity {
         progressDialog.setTitle("Actualizando...");
         progressDialog.setMessage("Actualizando Perfil");
         progressDialog.setCancelable(false);
-        
+
         progressDialog.show();
 
         String genero = "Genero";
@@ -760,13 +760,14 @@ public class RegistroPasajerosActivity extends AppCompatActivity {
 
     }
 
-    private Uri GuardarFoto(Uri foto) {
+    private String GuardarFoto(Uri foto) {
 
         final Uri[] downloadUri = new Uri[1];
         StorageReference folderRef = storageReference.child("fotosPasajeros");
         StorageReference fotoRef = folderRef.child(new Date().toString());
 
         fotoRef.putFile(foto).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                 Task<Uri> uriTask =taskSnapshot.getStorage().getDownloadUrl();
@@ -777,7 +778,7 @@ public class RegistroPasajerosActivity extends AppCompatActivity {
             }
         });
 
-        Log.e("TAG", downloadUri[0].toString());
-        return downloadUri[0];
+
+        return downloadUri[0].toString();
     }
 }
