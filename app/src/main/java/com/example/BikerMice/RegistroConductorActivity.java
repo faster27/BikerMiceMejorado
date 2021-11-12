@@ -1118,65 +1118,109 @@ public class RegistroConductorActivity extends AppCompatActivity {
 
 
                                 }else{
-                                    Auth.createUserWithEmailAndPassword(campoEmail.getText().toString(),campoPassword.getText().toString()).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+
+                                    StorageReference folderRef = storageReference.child("fotosConductores");
+                                    StorageReference fotoRef = folderRef.child(new Date().toString());
+
+                                    fotoRef.putFile(pathFotoConductor).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                        Uri downloadUriConductor;
                                         @Override
-                                        public void onComplete(@NonNull Task<AuthResult> task) {
-
-                                            if(task.isSuccessful()){
-
-                                                Map<String,Object> map =new HashMap<>();
-
-                                                map.put("email",campoEmail.getText().toString());
-                                                map.put("contrasena",campoPassword.getText().toString());
-                                                map.put("cedula",campoCedula.getText().toString());
-                                                map.put("nombre",campoNombre.getText().toString());
-                                                map.put("genero",generoConductor);
-                                                map.put("edad",campoEdad.getText().toString());
-                                                map.put("telefono",campotelefono.getText().toString());
-                                                map.put("estadocivil",EstadoCivil);
-                                                map.put("residencia",LugarResidencia);
-                                                map.put("laboral",LugarLaboral);
-                                                map.put("modelo",campoModelo.getText().toString());
-                                                map.put("marca",campoMarca.getText().toString());
-                                                map.put("placa",campoPlaca.getText().toString());
-                                                map.put("diaslaborales",DiasLaborales2) ;
-                                                map.put("implementos",campoImplementos.getText().toString()) ;
-
-                                                String id = Auth.getCurrentUser().getUid();
-
-                                                database.child("Conductores").child(id).setValue(map).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                    @Override
-                                                    public void onComplete(@NonNull Task<Void> task2) {
-
-                                                        if(task2.isSuccessful()){
-
-                                                            Toast.makeText(getApplicationContext(), "Usuario registrado con exito", Toast.LENGTH_SHORT).show();
-
-                                                            Intent MyIntent = new Intent(getApplicationContext(),MainActivity.class);
-                                                            startActivity(MyIntent);
-                                                            finish();
+                                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                            Task<Uri> uriTask =taskSnapshot.getStorage().getDownloadUrl();
+                                            while(!uriTask.isSuccessful());
+                                            downloadUriConductor =uriTask.getResult();
 
 
-                                                        }else{
+                                            //AQUI SE GUARDA LA FOT DE LA MOTO DEL CONDUCTOR
 
-                                                            Toast.makeText(getApplicationContext(), "Registro fallido", Toast.LENGTH_SHORT).show();
+                                            StorageReference folderRef = storageReference.child("fotosMotos");
+                                            StorageReference fotoRef = folderRef.child(new Date().toString());
 
+                                            fotoRef.putFile(pathFotoConductor).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                                Uri downloadUriMoto;
+                                                @Override
+                                                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                                    Task<Uri> uriTask =taskSnapshot.getStorage().getDownloadUrl();
+                                                    while(!uriTask.isSuccessful());
+                                                    downloadUriMoto =uriTask.getResult();
+
+
+                                                    ///AQUI YA SE GUARDA EL CONDCUTOR
+
+                                                    Auth.createUserWithEmailAndPassword(campoEmail.getText().toString(),campoPassword.getText().toString()).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                                                        @Override
+                                                        public void onComplete(@NonNull Task<AuthResult> task) {
+
+                                                            if(task.isSuccessful()){
+
+                                                                Map<String,Object> map =new HashMap<>();
+
+                                                                map.put("email",campoEmail.getText().toString());
+                                                                map.put("contrasena",campoPassword.getText().toString());
+                                                                map.put("cedula",campoCedula.getText().toString());
+                                                                map.put("nombre",campoNombre.getText().toString());
+                                                                map.put("genero",generoConductor);
+                                                                map.put("edad",campoEdad.getText().toString());
+                                                                map.put("telefono",campotelefono.getText().toString());
+                                                                map.put("estadocivil",EstadoCivil);
+                                                                map.put("residencia",LugarResidencia);
+                                                                map.put("laboral",LugarLaboral);
+                                                                map.put("modelo",campoModelo.getText().toString());
+                                                                map.put("marca",campoMarca.getText().toString());
+                                                                map.put("placa",campoPlaca.getText().toString());
+                                                                map.put("diaslaborales",DiasLaborales2) ;
+                                                                map.put("implementos",campoImplementos.getText().toString()) ;
+                                                                map.put("linkfotoconductor",downloadUriConductor.toString());
+                                                                map.put("linkfotomodo",downloadUriMoto.toString());
+
+                                                                String id = Auth.getCurrentUser().getUid();
+
+                                                                database.child("Conductores").child(id).setValue(map).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                    @Override
+                                                                    public void onComplete(@NonNull Task<Void> task2) {
+
+                                                                        if(task2.isSuccessful()){
+
+                                                                            Toast.makeText(getApplicationContext(), "Usuario registrado con exito", Toast.LENGTH_SHORT).show();
+
+                                                                            Intent MyIntent = new Intent(getApplicationContext(),MainActivity.class);
+                                                                            progressDialog.dismiss();
+                                                                            startActivity(MyIntent);
+                                                                            finish();
+
+
+                                                                        }else{
+
+                                                                            Toast.makeText(getApplicationContext(), "Registro fallido", Toast.LENGTH_SHORT).show();
+
+
+                                                                        }
+
+
+
+                                                                    }
+                                                                });
+
+                                                            }else{
+
+                                                                Toast.makeText(getApplicationContext(), "No se pudo registar el usuario", Toast.LENGTH_SHORT).show();
+
+                                                            }
 
                                                         }
+                                                    });
 
 
+                                                }
+                                            });
 
-                                                    }
-                                                });
-
-                                            }else{
-
-                                                Toast.makeText(getApplicationContext(), "No se pudo registar el usuario", Toast.LENGTH_SHORT).show();
-
-                                            }
 
                                         }
                                     });
+
+
+
+
 
 
                                 }
