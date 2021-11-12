@@ -201,6 +201,8 @@
                 app:srcCompat="@drawable/editarperfil"
                 tools:srcCompat="@drawable/editarperfil" />
 
+
+
             <ImageView
                 android:id="@+id/imageViewCerrarSesion"
                 android:layout_width="40dp"
@@ -228,6 +230,22 @@
                 app:layout_constraintStart_toEndOf="@+id/imageViewFotoPasajeroRegistro"
                 app:layout_constraintTop_toBottomOf="@+id/imageViewCerrarSesion"
                 app:srcCompat="@drawable/moto" />
+
+            <ImageView
+                android:id="@+id/mapSitio"
+                android:layout_width="72dp"
+                android:layout_height="54dp"
+                android:layout_marginStart="7dp"
+                android:layout_marginTop="125dp"
+                android:layout_marginEnd="64dp"
+                android:layout_marginBottom="16dp"
+                android:clickable="true"
+                android:onClick="onClickmapSitio"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/tituloBienvenida"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/imageViewEditarPerfil"
+                app:srcCompat="@drawable/iconomap" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </FrameLayout>
