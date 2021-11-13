@@ -27,27 +27,45 @@
 
         <activity
             android:name="com.example.BikerMice.InformacionConductorActivity"
-            android:exported="true" />
+            android:exported="true"
+            android:screenOrientation="portrait"/>
+
         <activity
             android:name="com.example.BikerMice.ResultadoBusquedaActivity"
-            android:exported="true" />
+            android:exported="true"
+            android:screenOrientation="portrait"/>
+
         <activity
             android:name="com.example.BikerMice.SplashActivity"
-            android:exported="true">
+            android:exported="true"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
             android:name="com.example.BikerMice.MainActivity"
-            android:exported="true" />
-        <activity android:name="com.example.BikerMice.SeleccionRegistroActivity" />
-        <activity android:name="com.example.BikerMice.RegistroPasajerosActivity" />
-        <activity android:name="com.example.BikerMice.RegistroConductorActivity" />
-        <activity android:name="com.example.BikerMice.PerfilConductorActivity" />
-        <activity android:name="com.example.BikerMice.PerfilPasajeroActivity" />
+            android:exported="true"
+            android:screenOrientation="portrait"/>
+
+        <activity android:name="com.example.BikerMice.SeleccionRegistroActivity"
+            android:screenOrientation="portrait"/>
+
+        <activity android:name="com.example.BikerMice.RegistroPasajerosActivity"
+            android:screenOrientation="portrait"/>
+
+        <activity android:name="com.example.BikerMice.RegistroConductorActivity"
+            android:screenOrientation="portrait"/>
+
+        <activity android:name="com.example.BikerMice.PerfilConductorActivity"
+            android:screenOrientation="portrait"/>
+
+        <activity android:name="com.example.BikerMice.PerfilPasajeroActivity"
+            android:screenOrientation="portrait"/>
+        
         <activity android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
             android:theme="@style/Base.Theme.AppCompat"/> <!-- optional (needed if default theme has no action bar) -->
 
