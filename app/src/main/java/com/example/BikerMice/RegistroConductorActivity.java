@@ -1557,40 +1557,40 @@ public class RegistroConductorActivity extends AppCompatActivity {
 
                                 }else{
 
-                                    StorageReference folderRefConductor = storageReference.child("fotosConductores");
-                                    StorageReference fotoRefConductor = folderRefConductor.child(new Date().toString());
-
-                                    fotoRefConductor.putFile(pathFotoConductor).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                                        Uri downloadUriConductor;
+                                    Auth.createUserWithEmailAndPassword(campoEmail.getText().toString(),campoPassword.getText().toString()).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                                         @Override
-                                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                            Task<Uri> uriTask =taskSnapshot.getStorage().getDownloadUrl();
-                                            while(!uriTask.isSuccessful());
-                                            downloadUriConductor =uriTask.getResult();
+                                        public void onComplete(@NonNull Task<AuthResult> task) {
+
+                                            if(task.isSuccessful()){
 
 
-                                            //AQUI SE GUARDA LA FOTO DE LA MOTO DEL CONDUCTOR
+                                                StorageReference folderRefConductor = storageReference.child("fotosConductores");
+                                                StorageReference fotoRefConductor = folderRefConductor.child(new Date().toString());
 
-                                            StorageReference folderRefMoto = storageReference.child("fotosMotos");
-                                            StorageReference fotoRefMoto = folderRefMoto.child(new Date().toString());
-
-                                            fotoRefMoto.putFile(pathFotoMoto).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                                                Uri downloadUriMoto;
-                                                @Override
-                                                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                                    Task<Uri> uriTask =taskSnapshot.getStorage().getDownloadUrl();
-                                                    while(!uriTask.isSuccessful());
-                                                    downloadUriMoto =uriTask.getResult();
+                                                fotoRefConductor.putFile(pathFotoConductor).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                                    Uri downloadUriConductor;
+                                                    @Override
+                                                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                                        Task<Uri> uriTask =taskSnapshot.getStorage().getDownloadUrl();
+                                                        while(!uriTask.isSuccessful());
+                                                        downloadUriConductor =uriTask.getResult();
 
 
-                                                    ///AQUI YA SE GUARDA EL CONDCUTOR
+                                                        //AQUI SE GUARDA LA FOTO DE LA MOTO DEL CONDUCTOR
 
-                                                    Auth.createUserWithEmailAndPassword(campoEmail.getText().toString(),campoPassword.getText().toString()).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                                                        @Override
-                                                        public void onComplete(@NonNull Task<AuthResult> task) {
+                                                        StorageReference folderRefMoto = storageReference.child("fotosMotos");
+                                                        StorageReference fotoRefMoto = folderRefMoto.child(new Date().toString());
 
-                                                            if(task.isSuccessful()){
+                                                        fotoRefMoto.putFile(pathFotoMoto).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                                            Uri downloadUriMoto;
+                                                            @Override
+                                                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                                                Task<Uri> uriTask =taskSnapshot.getStorage().getDownloadUrl();
+                                                                while(!uriTask.isSuccessful());
+                                                                downloadUriMoto =uriTask.getResult();
 
+
+                                                                ///AQUI YA SE GUARDA EL CONDCUTOR
                                                                 Map<String,Object> map =new HashMap<>();
 
                                                                 map.put("email",campoEmail.getText().toString());
@@ -1639,19 +1639,29 @@ public class RegistroConductorActivity extends AppCompatActivity {
                                                                     }
                                                                 });
 
-                                                            }else{
 
-                                                                Toast.makeText(getApplicationContext(), "No se pudo registar el usuario", Toast.LENGTH_SHORT).show();
 
                                                             }
-
-                                                        }
-                                                    });
+                                                        });
 
 
-                                                }
-                                            });
+                                                    }
+                                                });
 
+
+
+
+
+
+
+
+
+
+                                            }else{
+
+                                                Toast.makeText(getApplicationContext(), "No se pudo registar el usuario", Toast.LENGTH_SHORT).show();
+
+                                            }
 
                                         }
                                     });
