@@ -63,6 +63,20 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        FirebaseUser user = Auth.getCurrentUser();
+
+        if(user!=null){
+
+
+
+
+        }
+    }
+
     private void initGoogleClient() {
 
         GoogleSignInOptions gso= new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
