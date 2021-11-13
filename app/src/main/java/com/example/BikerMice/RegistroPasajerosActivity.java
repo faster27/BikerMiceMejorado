@@ -282,7 +282,7 @@ public class RegistroPasajerosActivity extends AppCompatActivity {
         progressDialog.setTitle("Actualizando...");
         progressDialog.setMessage("Actualizando Perfil");
         progressDialog.setCancelable(false);
-        
+
         progressDialog.show();
 
         String genero = "Genero";
@@ -470,6 +470,12 @@ public class RegistroPasajerosActivity extends AppCompatActivity {
 
     private void RegistrarUsuarios() {
 
+        progressDialog.setTitle("Registrando...");
+        progressDialog.setMessage("Registrando Perfil");
+        progressDialog.setCancelable(false);
+
+        progressDialog.show();
+
 
         String genero = "Genero";
         String residencia="Lugar de residencia";
@@ -537,6 +543,7 @@ public class RegistroPasajerosActivity extends AppCompatActivity {
                                                     Toast.makeText(getApplicationContext(), "Usuario registrado con exito", Toast.LENGTH_SHORT).show();
 
                                                     Intent MyIntent = new Intent(getApplicationContext(),MainActivity.class);
+                                                    progressDialog.dismiss();
                                                     startActivity(MyIntent);
                                                     finish();
 
@@ -564,61 +571,66 @@ public class RegistroPasajerosActivity extends AppCompatActivity {
                             else{
 
 
-
-                                StorageReference folderRef = storageReference.child("fotosPasajeros");
-                                StorageReference fotoRef = folderRef.child(new Date().toString());
-
-                                fotoRef.putFile(path).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                                    Uri downloadUri;
-                                    @Override
-                                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                        Task<Uri> uriTask =taskSnapshot.getStorage().getDownloadUrl();
-                                        while(!uriTask.isSuccessful());
-                                        downloadUri=uriTask.getResult();
-
                                         Auth.createUserWithEmailAndPassword(campoEmail.getText().toString(),campoPassword.getText().toString()).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                                             @Override
                                             public void onComplete(@NonNull Task<AuthResult> task) {
 
                                                 if(task.isSuccessful()){
 
-                                                    Map<String,Object> map =new HashMap<>();
+                                                    StorageReference folderRef = storageReference.child("fotosPasajeros");
+                                                    StorageReference fotoRef = folderRef.child(new Date().toString());
 
-                                                    map.put("email",campoEmail.getText().toString());
-                                                    map.put("contrasena",campoPassword.getText().toString());
-                                                    map.put("nombre",campoNombre.getText().toString());
-                                                    map.put("cedula",campoCedula.getText().toString());
-                                                    map.put("edad",campoEdad.getText().toString());
-                                                    map.put("genero",GeneroPasajero);
-                                                    map.put("residencia",LugarResidencia);
-                                                    map.put("linkfoto",downloadUri.toString());
-
-
-
-
-
-                                                    String id = FirebaseAuth.getInstance().getCurrentUser().getUid();
-
-                                                    database.child("Users").child(id).setValue(map).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                    fotoRef.putFile(path).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                                        Uri downloadUri;
                                                         @Override
-                                                        public void onComplete(@NonNull Task<Void> task2) {
-                                                            if(task2.isSuccessful()){
+                                                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                                            Task<Uri> uriTask =taskSnapshot.getStorage().getDownloadUrl();
+                                                            while(!uriTask.isSuccessful());
+                                                            downloadUri=uriTask.getResult();
 
-                                                                Toast.makeText(getApplicationContext(), "Usuario registrado con exito", Toast.LENGTH_SHORT).show();
+                                                            Map<String,Object> map =new HashMap<>();
 
-                                                                Intent MyIntent = new Intent(getApplicationContext(),MainActivity.class);
-                                                                startActivity(MyIntent);
-                                                                finish();
+                                                            map.put("email",campoEmail.getText().toString());
+                                                            map.put("contrasena",campoPassword.getText().toString());
+                                                            map.put("nombre",campoNombre.getText().toString());
+                                                            map.put("cedula",campoCedula.getText().toString());
+                                                            map.put("edad",campoEdad.getText().toString());
+                                                            map.put("genero",GeneroPasajero);
+                                                            map.put("residencia",LugarResidencia);
+                                                            map.put("linkfoto",downloadUri.toString());
 
 
 
-                                                            }else{
 
-                                                                Toast.makeText(getApplicationContext(), "Registro fallido", Toast.LENGTH_SHORT).show();
 
-                                                            }
+                                                            String id = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+                                                            database.child("Users").child(id).setValue(map).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                @Override
+                                                                public void onComplete(@NonNull Task<Void> task2) {
+                                                                    if(task2.isSuccessful()){
+
+                                                                        Toast.makeText(getApplicationContext(), "Usuario registrado con exito", Toast.LENGTH_SHORT).show();
+
+                                                                        Intent MyIntent = new Intent(getApplicationContext(),MainActivity.class);
+                                                                        progressDialog.dismiss();
+                                                                        startActivity(MyIntent);
+                                                                        finish();
+
+
+
+                                                                    }else{
+
+                                                                        Toast.makeText(getApplicationContext(), "Registro fallido", Toast.LENGTH_SHORT).show();
+
+                                                                    }
+                                                                }
+                                                            });
+
                                                         }
                                                     });
+
+
 
 
                                                 }
@@ -627,8 +639,7 @@ public class RegistroPasajerosActivity extends AppCompatActivity {
                                         });
 
 
-                                    }
-                                });
+
 
 
 
@@ -760,13 +771,14 @@ public class RegistroPasajerosActivity extends AppCompatActivity {
 
     }
 
-    private Uri GuardarFoto(Uri foto) {
+    private String GuardarFoto(Uri foto) {
 
         final Uri[] downloadUri = new Uri[1];
         StorageReference folderRef = storageReference.child("fotosPasajeros");
         StorageReference fotoRef = folderRef.child(new Date().toString());
 
         fotoRef.putFile(foto).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                 Task<Uri> uriTask =taskSnapshot.getStorage().getDownloadUrl();
@@ -777,7 +789,7 @@ public class RegistroPasajerosActivity extends AppCompatActivity {
             }
         });
 
-        Log.e("TAG", downloadUri[0].toString());
-        return downloadUri[0];
+
+        return downloadUri[0].toString();
     }
 }

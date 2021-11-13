@@ -15,6 +15,12 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.initialization.InitializationStatus;
+import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
+import com.google.android.gms.ads.interstitial.InterstitialAd;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -45,6 +51,10 @@ public class MainActivity extends AppCompatActivity {
 
     private GoogleSignInClient googleSignInCliente;
     private static final int GOOGLE_SIGN_IN=1111;
+    private InterstitialAd mInterstitialAd;
+    private AdView mAdView;
+
+
 
     protected void  onCreate(Bundle SavedInstanceStatus){
 
@@ -56,11 +66,41 @@ public class MainActivity extends AppCompatActivity {
         Google=findViewById(R.id.imageViewGoogle);
         Auth=FirebaseAuth.getInstance();
         db=FirebaseDatabase.getInstance().getReference();
-        
+
+
+        MobileAds.initialize(this, new OnInitializationCompleteListener() {
+            @Override
+            public void onInitializationComplete(InitializationStatus initializationStatus) {
+            }
+        });
+        mAdView = findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
+
+
+
+
+
+
         initGoogleClient();
 
 
 
+    }
+
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        FirebaseUser user = Auth.getCurrentUser();
+
+        if(user!=null){
+
+
+
+
+        }
     }
 
     private void initGoogleClient() {

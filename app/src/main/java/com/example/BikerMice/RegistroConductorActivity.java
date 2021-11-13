@@ -1,5 +1,6 @@
 package com.example.BikerMice;
 
+import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
@@ -15,6 +16,8 @@ import android.provider.MediaStore;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -26,6 +29,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.BikerMice.utilidades.Utilidades;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -39,8 +43,12 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -78,6 +86,11 @@ public class RegistroConductorActivity extends AppCompatActivity {
     int seleccionBoton;
 
 
+    Uri pathFotoConductor;
+    Uri pathFotoMoto;
+    StorageReference storageReference;
+
+
 
     //AQUI VAN LOS SPINNERS  Y LOS CHECKBOXS
 
@@ -88,6 +101,8 @@ public class RegistroConductorActivity extends AppCompatActivity {
 
     ImageView imagenConductor,imagenMoto;
     Bundle BundleEditarPerfil;
+
+    private ProgressDialog progressDialog;
 
 
     @Override
@@ -100,6 +115,7 @@ public class RegistroConductorActivity extends AppCompatActivity {
 
         Auth=FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance().getReference();
+        storageReference= FirebaseStorage.getInstance().getReference();
 
 
 
@@ -132,6 +148,8 @@ public class RegistroConductorActivity extends AppCompatActivity {
         imagenConductor =findViewById(R.id.imageViewFotoPasajero);
         campoEmail=findViewById(R.id.editTextEmailConductor);
         campoPassword=findViewById(R.id.editTextPasswordConductor);
+
+        progressDialog = new ProgressDialog(this);
 
 
 
@@ -631,7 +649,14 @@ public class RegistroConductorActivity extends AppCompatActivity {
                    String placa=snapshot.child("placa").getValue().toString();
                    String diaslaborales=snapshot.child("diaslaborales").getValue().toString();
                    String implementos=snapshot.child("implementos").getValue().toString();
+                   String LinkFotoConductor = snapshot.child("linkfotoconductor").getValue().toString();
+                   String LinkFotoMoto = snapshot.child("linkfotomoto").getValue().toString();
 
+
+
+                   //SE SETEA LAS IMAGENES
+                   Glide.with(RegistroConductorActivity.this).load(LinkFotoConductor).into(imagenConductor);
+                   Glide.with(RegistroConductorActivity.this).load(LinkFotoMoto).into(imagenMoto);
 
                    //SE SETEA EL CAMPO EMAIL
                    campoEmail.setText(email);
@@ -709,41 +734,7 @@ public class RegistroConductorActivity extends AppCompatActivity {
 
 
 
-//Aqui esta la parte de las fotos
-/*
-        //SE SETA LA FOTO DEL CONDUCTOR
 
-        int columna13 =cursorConductor.getColumnIndex("fotoconductor");
-        byte[] Imagen = cursorConductor.getBlob(columna13);
-
-       
-
-        Bitmap bitmapImage = BitmapFactory.decodeByteArray(Imagen,0,Imagen.length);
-
-        imagenConductor.setImageBitmap(bitmapImage);
-
-
-        //SE SETA LA FOTO DE LA MOTO
-
-        int columna14 =cursorMoto.getColumnIndex("fotomoto");
-
-        byte[] Imagen2 = cursorMoto.getBlob(columna14);
-
-
-
-        Bitmap bitmapImage2 = BitmapFactory.decodeByteArray(Imagen2,0,Imagen2.length);
-
-        imagenMoto.setImageBitmap(bitmapImage2);
-
-
-        cursorConductor.close();
-
-        cursorMoto.close();
-
-        db.close();
-
-
-*/
 
 
     }
@@ -796,6 +787,12 @@ public class RegistroConductorActivity extends AppCompatActivity {
 
     private void ActualizarPerfil() {
 
+        progressDialog.setTitle("Actualizando...");
+        progressDialog.setMessage("Actualizando Perfil");
+        progressDialog.setCancelable(false);
+
+        progressDialog.show();
+
         String genero = "Genero";
         String residencia="Lugar de residencia";
         String civil="Estado civil";
@@ -821,51 +818,509 @@ public class RegistroConductorActivity extends AppCompatActivity {
         ){
             if(campoPassword.getText().toString().length()>=6) {
 
-                Map<String,Object> map =new HashMap<>();
+              if(pathFotoConductor==null && pathFotoMoto==null){
 
-                map.put("email",campoEmail.getText().toString());
-                map.put("cedula",campoCedula.getText().toString());
-                map.put("contrasena",campoPassword.getText().toString());
-                map.put("nombre",campoNombre.getText().toString());
-                map.put("genero",generoConductor);
-                map.put("edad",campoEdad.getText().toString());
-                map.put("telefono",campotelefono.getText().toString());
-                map.put("estadocivil",EstadoCivil);
-                map.put("residencia",LugarResidencia);
-                map.put("laboral",LugarLaboral);
-                map.put("modelo",campoModelo.getText().toString());
-                map.put("marca",campoMarca.getText().toString());
-                map.put("placa",campoPlaca.getText().toString());
-                map.put("diaslaborales",DiasLaborales2) ;
-                map.put("implementos",campoImplementos.getText().toString());
+                  Map<String,Object> map =new HashMap<>();
 
-                database.child("Conductores").child(Auth.getCurrentUser().getUid().toString()).updateChildren(map).addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void unused) {
+                  map.put("email",campoEmail.getText().toString());
+                  map.put("cedula",campoCedula.getText().toString());
+                  map.put("contrasena",campoPassword.getText().toString());
+                  map.put("nombre",campoNombre.getText().toString());
+                  map.put("genero",generoConductor);
+                  map.put("edad",campoEdad.getText().toString());
+                  map.put("telefono",campotelefono.getText().toString());
+                  map.put("estadocivil",EstadoCivil);
+                  map.put("residencia",LugarResidencia);
+                  map.put("laboral",LugarLaboral);
+                  map.put("modelo",campoModelo.getText().toString());
+                  map.put("marca",campoMarca.getText().toString());
+                  map.put("placa",campoPlaca.getText().toString());
+                  map.put("diaslaborales",DiasLaborales2) ;
+                  map.put("implementos",campoImplementos.getText().toString());
 
-                        Toast.makeText(getApplicationContext(), "Usuario Actualizado con exito", Toast.LENGTH_SHORT).show();
+                  database.child("Conductores").child(Auth.getCurrentUser().getUid().toString()).updateChildren(map).addOnSuccessListener(new OnSuccessListener<Void>() {
+                      @Override
+                      public void onSuccess(Void unused) {
 
-                        Intent MiIntent = new Intent(getApplicationContext(),PerfilConductorActivity.class);
+                          Toast.makeText(getApplicationContext(), "Usuario Actualizado con exito", Toast.LENGTH_SHORT).show();
 
-                        Bundle MiBundle=new Bundle();
-                        MiBundle.putString("Uid",Auth.getCurrentUser().getUid());
-                        MiBundle.putString("señal","2");
+                          Intent MiIntent = new Intent(getApplicationContext(),PerfilConductorActivity.class);
 
-                        MiIntent.putExtras(MiBundle);
+                          Bundle MiBundle=new Bundle();
+                          MiBundle.putString("Uid",Auth.getCurrentUser().getUid());
+                          MiBundle.putString("señal","2");
 
-                        startActivity(MiIntent);
-                        finish();
+                          MiIntent.putExtras(MiBundle);
 
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
+                          startActivity(MiIntent);
+                          finish();
 
-                        Toast.makeText(getApplicationContext(), "Actualizacion fallida", Toast.LENGTH_SHORT).show();
+                      }
+                  }).addOnFailureListener(new OnFailureListener() {
+                      @Override
+                      public void onFailure(@NonNull Exception e) {
+
+                          Toast.makeText(getApplicationContext(), "Actualizacion fallida", Toast.LENGTH_SHORT).show();
 
 
-                    }
-                });
+                      }
+                  });
+
+
+
+
+              }else{
+
+                  ///AQUI ES DONDE SE ACTUALIZA EL PERFIL CUANDO ALGUNA DE LAS DOS FOTOS ES ACTUALIZADA
+
+
+
+                  StorageReference folderRefConductores = storageReference.child("fotosConductores");
+                  StorageReference fotoRefConductores = folderRefConductores.child(new Date().toString());
+
+
+                  StorageReference folderRefMotos = storageReference.child("fotosMotos");
+                  StorageReference fotoRefMotos = folderRefMotos.child(new Date().toString());
+
+
+                  if(!(pathFotoMoto==null) && !(pathFotoConductor==null)){
+                      database.child("Conductores").child(Auth.getCurrentUser().getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+                          @Override
+                          public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                              if(snapshot.exists()){
+
+
+                                  String linkfotomoto=snapshot.child("linkfotomoto").getValue().toString();
+                                  String linkfotoconductor=snapshot.child("linkfotoconductor").getValue().toString();
+
+                                  StorageReference photoRefMoto=folderRefMotos.getStorage().getReferenceFromUrl(linkfotomoto);
+                                  StorageReference photoRefConductor=folderRefConductores.getStorage().getReferenceFromUrl(linkfotoconductor);
+
+
+                                  photoRefMoto.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                      @Override
+                                      public void onSuccess(Void aVoid) {
+
+                                          Log.e("Tag","estoy aqui eimando moto");
+
+                                      }
+                                  }).addOnFailureListener(new OnFailureListener() {
+                                      @Override
+                                      public void onFailure(@NonNull Exception exception) {
+                                          // Uh-oh, an error occurred!
+
+                                      }
+                                  });
+
+
+                                  photoRefConductor.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                      @Override
+                                      public void onSuccess(Void aVoid) {
+                                          Log.e("Tag","estoy aqui eimando condcutor");
+
+                                      }
+                                  }).addOnFailureListener(new OnFailureListener() {
+                                      @Override
+                                      public void onFailure(@NonNull Exception exception) {
+                                          // Uh-oh, an error occurred!
+
+                                      }
+                                  });
+
+
+
+                                  //AHORA SE GUARDA LA NUEVA FOTO EN EL STORAGE
+
+                                  fotoRefMotos.putFile(pathFotoMoto).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                      Uri downloadUriMoto;
+                                      @Override
+                                      public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                          Task<Uri> uriTask =taskSnapshot.getStorage().getDownloadUrl();
+                                          while(!uriTask.isSuccessful());
+                                          downloadUriMoto=uriTask.getResult();
+
+                                          Map<String,Object> map =new HashMap<>();
+
+                                          map.put("email",campoEmail.getText().toString());
+                                          map.put("cedula",campoCedula.getText().toString());
+                                          map.put("contrasena",campoPassword.getText().toString());
+                                          map.put("nombre",campoNombre.getText().toString());
+                                          map.put("genero",generoConductor);
+                                          map.put("edad",campoEdad.getText().toString());
+                                          map.put("telefono",campotelefono.getText().toString());
+                                          map.put("estadocivil",EstadoCivil);
+                                          map.put("residencia",LugarResidencia);
+                                          map.put("laboral",LugarLaboral);
+                                          map.put("modelo",campoModelo.getText().toString());
+                                          map.put("marca",campoMarca.getText().toString());
+                                          map.put("placa",campoPlaca.getText().toString());
+                                          map.put("diaslaborales",DiasLaborales2) ;
+                                          map.put("implementos",campoImplementos.getText().toString());
+                                          map.put("linkfotomoto",downloadUriMoto.toString());
+
+
+                                          database.child("Conductores").child(Auth.getCurrentUser().getUid().toString()).updateChildren(map).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                              @Override
+                                              public void onSuccess(Void unused) {
+
+
+
+
+                                              }
+                                          }).addOnFailureListener(new OnFailureListener() {
+                                              @Override
+                                              public void onFailure(@NonNull Exception e) {
+
+                                                  Toast.makeText(getApplicationContext(), "Actualizacion fallida", Toast.LENGTH_SHORT).show();
+
+
+                                              }
+                                          });
+
+
+
+
+
+
+                                      }
+                                  });
+
+
+
+                                  fotoRefConductores.putFile(pathFotoConductor).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+
+                                      Uri downloadUriConductor;
+
+                                      @Override
+                                      public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                          Task<Uri> uriTask1=taskSnapshot.getStorage().getDownloadUrl();
+                                          while (!uriTask1.isSuccessful());
+                                          downloadUriConductor=uriTask1.getResult();
+
+
+                                          Map<String,Object> map =new HashMap<>();
+
+                                          map.put("email",campoEmail.getText().toString());
+                                          map.put("cedula",campoCedula.getText().toString());
+                                          map.put("contrasena",campoPassword.getText().toString());
+                                          map.put("nombre",campoNombre.getText().toString());
+                                          map.put("genero",generoConductor);
+                                          map.put("edad",campoEdad.getText().toString());
+                                          map.put("telefono",campotelefono.getText().toString());
+                                          map.put("estadocivil",EstadoCivil);
+                                          map.put("residencia",LugarResidencia);
+                                          map.put("laboral",LugarLaboral);
+                                          map.put("modelo",campoModelo.getText().toString());
+                                          map.put("marca",campoMarca.getText().toString());
+                                          map.put("placa",campoPlaca.getText().toString());
+                                          map.put("diaslaborales",DiasLaborales2) ;
+                                          map.put("implementos",campoImplementos.getText().toString());
+                                          map.put("linkfotoconductor",downloadUriConductor.toString());
+
+
+
+                                          database.child("Conductores").child(Auth.getCurrentUser().getUid().toString()).updateChildren(map).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                              @Override
+                                              public void onSuccess(Void unused) {
+
+                                                  Toast.makeText(getApplicationContext(), "Usuario Actualizado con exito", Toast.LENGTH_SHORT).show();
+                                                  Intent MiIntent = new Intent(getApplicationContext(),PerfilConductorActivity.class);
+
+                                                  Bundle MiBundle=new Bundle();
+                                                  MiBundle.putString("Uid",Auth.getCurrentUser().getUid());
+                                                  MiBundle.putString("señal","2");
+
+                                                  MiIntent.putExtras(MiBundle);
+                                                  progressDialog.dismiss();
+
+                                                  startActivity(MiIntent);
+                                                  finish();
+
+
+                                              }
+                                          }).addOnFailureListener(new OnFailureListener() {
+                                              @Override
+                                              public void onFailure(@NonNull Exception e) {
+
+                                                  Toast.makeText(getApplicationContext(), "Actualizacion fallida", Toast.LENGTH_SHORT).show();
+
+
+                                              }
+                                          });
+
+
+
+
+                                      }
+                                  });
+
+
+
+                              }
+
+                          }
+
+                          @Override
+                          public void onCancelled(@NonNull DatabaseError error) {
+
+                          }
+                      });
+
+
+
+
+
+                  }else if (!(pathFotoMoto==null) ){
+
+                      //PRIMERO SE CONSULTA EL LINK QUE SE QUIERE ACTUALIZAR Y SE ELIMINA DEL STORAGE
+
+                      database.child("Conductores").child(Auth.getCurrentUser().getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+                          @Override
+                          public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                              if(snapshot.exists()){
+
+
+                                  String linkfotomoto=snapshot.child("linkfotomoto").getValue().toString();
+
+
+                                  StorageReference photoRef=folderRefMotos.getStorage().getReferenceFromUrl(linkfotomoto);
+
+                                  photoRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                      @Override
+                                      public void onSuccess(Void aVoid) {
+
+                                      }
+                                  }).addOnFailureListener(new OnFailureListener() {
+                                      @Override
+                                      public void onFailure(@NonNull Exception exception) {
+                                          // Uh-oh, an error occurred!
+
+                                      }
+                                  });
+
+
+
+                              }
+
+                          }
+
+                          @Override
+                          public void onCancelled(@NonNull DatabaseError error) {
+
+                          }
+                      });
+
+                      //AHORA SE GUARDA LA NUEVA FOTO EN EL STORAGE
+
+                      fotoRefMotos.putFile(pathFotoMoto).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                          Uri downloadUri;
+                          @Override
+                          public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                              Task<Uri> uriTask =taskSnapshot.getStorage().getDownloadUrl();
+                              while(!uriTask.isSuccessful());
+                              downloadUri=uriTask.getResult();
+
+                              Map<String,Object> map =new HashMap<>();
+
+                              map.put("email",campoEmail.getText().toString());
+                              map.put("cedula",campoCedula.getText().toString());
+                              map.put("contrasena",campoPassword.getText().toString());
+                              map.put("nombre",campoNombre.getText().toString());
+                              map.put("genero",generoConductor);
+                              map.put("edad",campoEdad.getText().toString());
+                              map.put("telefono",campotelefono.getText().toString());
+                              map.put("estadocivil",EstadoCivil);
+                              map.put("residencia",LugarResidencia);
+                              map.put("laboral",LugarLaboral);
+                              map.put("modelo",campoModelo.getText().toString());
+                              map.put("marca",campoMarca.getText().toString());
+                              map.put("placa",campoPlaca.getText().toString());
+                              map.put("diaslaborales",DiasLaborales2) ;
+                              map.put("implementos",campoImplementos.getText().toString());
+                              map.put("linkfotomoto",downloadUri.toString());
+
+                              database.child("Conductores").child(Auth.getCurrentUser().getUid().toString()).updateChildren(map).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                  @Override
+                                  public void onSuccess(Void unused) {
+
+                                      Toast.makeText(getApplicationContext(), "Usuario Actualizado con exito", Toast.LENGTH_SHORT).show();
+
+                                      Intent MiIntent = new Intent(getApplicationContext(),PerfilConductorActivity.class);
+
+                                      Bundle MiBundle=new Bundle();
+                                      MiBundle.putString("Uid",Auth.getCurrentUser().getUid());
+                                      MiBundle.putString("señal","2");
+
+                                      MiIntent.putExtras(MiBundle);
+                                      progressDialog.dismiss();
+
+                                      startActivity(MiIntent);
+                                      finish();
+
+
+                                  }
+                              }).addOnFailureListener(new OnFailureListener() {
+                                  @Override
+                                  public void onFailure(@NonNull Exception e) {
+
+                                      Toast.makeText(getApplicationContext(), "Actualizacion fallida", Toast.LENGTH_SHORT).show();
+
+
+                                  }
+                              });
+
+
+
+                          }
+                      });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                  }else if(!(pathFotoConductor==null)){
+
+                        //PRIMERO SE CONSULTA EL LINK QUE SE QUIERE ACTUALIZAR Y SE ELIMINA DEL STORAGE
+
+                      database.child("Conductores").child(Auth.getCurrentUser().getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+                          @Override
+                          public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                              if(snapshot.exists()){
+
+
+                                  String linkfotoconductor=snapshot.child("linkfotoconductor").getValue().toString();
+
+
+
+
+                                  StorageReference photoRef=folderRefConductores.getStorage().getReferenceFromUrl(linkfotoconductor);
+
+                                  photoRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                      @Override
+                                      public void onSuccess(Void aVoid) {
+
+                                      }
+                                  }).addOnFailureListener(new OnFailureListener() {
+                                      @Override
+                                      public void onFailure(@NonNull Exception exception) {
+                                          // Uh-oh, an error occurred!
+
+                                      }
+                                  });
+
+
+
+                              }
+
+                          }
+
+                          @Override
+                          public void onCancelled(@NonNull DatabaseError error) {
+
+                          }
+                      });
+
+                    //AHORA SE GUARDA LA NUEVA FOTO EN EL STORAGE
+
+                      fotoRefConductores.putFile(pathFotoConductor).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                          Uri downloadUri;
+                          @Override
+                          public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                              Task<Uri> uriTask =taskSnapshot.getStorage().getDownloadUrl();
+                              while(!uriTask.isSuccessful());
+                              downloadUri=uriTask.getResult();
+
+                              Map<String,Object> map =new HashMap<>();
+
+                              map.put("email",campoEmail.getText().toString());
+                              map.put("cedula",campoCedula.getText().toString());
+                              map.put("contrasena",campoPassword.getText().toString());
+                              map.put("nombre",campoNombre.getText().toString());
+                              map.put("genero",generoConductor);
+                              map.put("edad",campoEdad.getText().toString());
+                              map.put("telefono",campotelefono.getText().toString());
+                              map.put("estadocivil",EstadoCivil);
+                              map.put("residencia",LugarResidencia);
+                              map.put("laboral",LugarLaboral);
+                              map.put("modelo",campoModelo.getText().toString());
+                              map.put("marca",campoMarca.getText().toString());
+                              map.put("placa",campoPlaca.getText().toString());
+                              map.put("diaslaborales",DiasLaborales2) ;
+                              map.put("implementos",campoImplementos.getText().toString());
+                              map.put("linkfotoconductor",downloadUri.toString());
+
+                              database.child("Conductores").child(Auth.getCurrentUser().getUid().toString()).updateChildren(map).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                  @Override
+                                  public void onSuccess(Void unused) {
+
+                                      Toast.makeText(getApplicationContext(), "Usuario Actualizado con exito", Toast.LENGTH_SHORT).show();
+                                      Intent MiIntent = new Intent(getApplicationContext(),PerfilConductorActivity.class);
+
+                                      Bundle MiBundle=new Bundle();
+                                      MiBundle.putString("Uid",Auth.getCurrentUser().getUid());
+                                      MiBundle.putString("señal","2");
+
+                                      MiIntent.putExtras(MiBundle);
+                                      progressDialog.dismiss();
+
+                                      startActivity(MiIntent);
+                                      finish();
+
+
+                                  }
+                              }).addOnFailureListener(new OnFailureListener() {
+                                  @Override
+                                  public void onFailure(@NonNull Exception e) {
+
+                                      Toast.makeText(getApplicationContext(), "Actualizacion fallida", Toast.LENGTH_SHORT).show();
+
+
+                                  }
+                              });
+
+
+
+                          }
+                      });
+
+
+
+                  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+              }
 
 
 
@@ -932,16 +1387,16 @@ public class RegistroConductorActivity extends AppCompatActivity {
 
         if(seleccionBoton==1 &&   resultCode==RESULT_OK){
 
-            Uri path=data.getData();
-            imagenConductor.setImageURI(path);
+            pathFotoConductor=data.getData();
+            imagenConductor.setImageURI(pathFotoConductor);
 
 
         }
 
         if(seleccionBoton==2 &&   resultCode==RESULT_OK){
 
-            Uri path=data.getData();
-            imagenMoto.setImageURI(path);
+            pathFotoMoto=data.getData();
+            imagenMoto.setImageURI(pathFotoMoto);
 
 
         }
@@ -954,6 +1409,12 @@ public class RegistroConductorActivity extends AppCompatActivity {
 
 
     private void RegistrarConductor() {
+
+        progressDialog.setTitle("Registrando...");
+        progressDialog.setMessage("Registrando Perfil");
+        progressDialog.setCancelable(false);
+
+        progressDialog.show();
 
         String genero = "Genero";
         String residencia="Lugar de residencia";
@@ -978,143 +1439,258 @@ public class RegistroConductorActivity extends AppCompatActivity {
 
 
         ){
-            if(campoPassword.getText().toString().length()>=6) {
+
+            if ((pathFotoConductor==null && pathFotoMoto==null) || (pathFotoConductor==null || pathFotoMoto==null) ){
+
+                Toast.makeText(getApplicationContext(), "Por favor suba las fotos", Toast.LENGTH_SHORT).show();
+
+            }else{
+
+                if(campoPassword.getText().toString().length()>=6) {
 
 
-                FirebaseAuth.getInstance().fetchSignInMethodsForEmail(campoEmail.getText().toString()).addOnCompleteListener(new OnCompleteListener<SignInMethodQueryResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<SignInMethodQueryResult> task) {
+                    FirebaseAuth.getInstance().fetchSignInMethodsForEmail(campoEmail.getText().toString()).addOnCompleteListener(new OnCompleteListener<SignInMethodQueryResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<SignInMethodQueryResult> task) {
 
-                        if(task.isSuccessful()){
+                            if(task.isSuccessful()){
 
-                            boolean check =!task.getResult().getSignInMethods().isEmpty();
+                                boolean check =!task.getResult().getSignInMethods().isEmpty();
 
-                            if(check){
-                                Map<String,Object> map =new HashMap<>();
+                                if(check){
 
-                                map.put("email",campoEmail.getText().toString());
-                                map.put("contrasena",campoPassword.getText().toString());
-                                map.put("cedula",campoCedula.getText().toString());
-                                map.put("nombre",campoNombre.getText().toString());
-                                map.put("genero",generoConductor);
-                                map.put("edad",campoEdad.getText().toString());
-                                map.put("telefono",campotelefono.getText().toString());
-                                map.put("estadocivil",EstadoCivil);
-                                map.put("residencia",LugarResidencia);
-                                map.put("laboral",LugarLaboral);
-                                map.put("modelo",campoModelo.getText().toString());
-                                map.put("marca",campoMarca.getText().toString());
-                                map.put("placa",campoPlaca.getText().toString());
-                                map.put("diaslaborales",DiasLaborales2) ;
-                                map.put("implementos",campoImplementos.getText().toString()) ;
-
-                                String id = Auth.getCurrentUser().getUid();
-
-                                database.child("Conductores").child(id).setValue(map).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<Void> task2) {
-
-                                        if(task2.isSuccessful()){
-
-                                            Toast.makeText(getApplicationContext(), "Usuario registrado con exito", Toast.LENGTH_SHORT).show();
-
-                                            Intent MyIntent = new Intent(getApplicationContext(),MainActivity.class);
-                                            startActivity(MyIntent);
-                                            finish();
+                                    StorageReference folderRef = storageReference.child("fotosConductores");
+                                    StorageReference fotoRef = folderRef.child(new Date().toString());
 
 
-                                        }else{
+                                    fotoRef.putFile(pathFotoConductor).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
 
-                                            Toast.makeText(getApplicationContext(), "Registro fallido", Toast.LENGTH_SHORT).show();
+                                        Uri downloadUriConductor;
+
+                                        //rimero se gurda la foto del condcutor
+                                        @Override
+                                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                            Task<Uri> uriTask =taskSnapshot.getStorage().getDownloadUrl();
+                                            while(!uriTask.isSuccessful());
+                                            downloadUriConductor =uriTask.getResult();
 
 
-                                        }
+                                            StorageReference folderRef = storageReference.child("fotosMotos");
+                                            StorageReference fotoRef = folderRef.child(new Date().toString());
 
 
 
-                                    }
-                                });
+                                            //aqui se guarda la foto de la moto
+                                            fotoRef.putFile(pathFotoMoto).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
 
-
-                            }else{
-                                Auth.createUserWithEmailAndPassword(campoEmail.getText().toString(),campoPassword.getText().toString()).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<AuthResult> task) {
-
-                                        if(task.isSuccessful()){
-
-                                            Map<String,Object> map =new HashMap<>();
-
-                                            map.put("email",campoEmail.getText().toString());
-                                            map.put("contrasena",campoPassword.getText().toString());
-                                            map.put("cedula",campoCedula.getText().toString());
-                                            map.put("nombre",campoNombre.getText().toString());
-                                            map.put("genero",generoConductor);
-                                            map.put("edad",campoEdad.getText().toString());
-                                            map.put("telefono",campotelefono.getText().toString());
-                                            map.put("estadocivil",EstadoCivil);
-                                            map.put("residencia",LugarResidencia);
-                                            map.put("laboral",LugarLaboral);
-                                            map.put("modelo",campoModelo.getText().toString());
-                                            map.put("marca",campoMarca.getText().toString());
-                                            map.put("placa",campoPlaca.getText().toString());
-                                            map.put("diaslaborales",DiasLaborales2) ;
-                                            map.put("implementos",campoImplementos.getText().toString()) ;
-
-                                            String id = Auth.getCurrentUser().getUid();
-
-                                            database.child("Conductores").child(id).setValue(map).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                Uri downloadUriMoto;
                                                 @Override
-                                                public void onComplete(@NonNull Task<Void> task2) {
-
-                                                    if(task2.isSuccessful()){
-
-                                                        Toast.makeText(getApplicationContext(), "Usuario registrado con exito", Toast.LENGTH_SHORT).show();
-
-                                                        Intent MyIntent = new Intent(getApplicationContext(),MainActivity.class);
-                                                        startActivity(MyIntent);
-                                                        finish();
+                                                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                                    Task<Uri> uriTask =taskSnapshot.getStorage().getDownloadUrl();
+                                                    while(!uriTask.isSuccessful());
+                                                    downloadUriMoto =uriTask.getResult();
 
 
-                                                    }else{
+                                                   //AQUI ES DONDE YA SE GUARDA EL CONDUCTOR EN EL REAL TIME con fotos y todo
 
-                                                        Toast.makeText(getApplicationContext(), "Registro fallido", Toast.LENGTH_SHORT).show();
+                                                    Map<String,Object> map =new HashMap<>();
+
+                                                    map.put("email",campoEmail.getText().toString());
+                                                    map.put("contrasena",campoPassword.getText().toString());
+                                                    map.put("cedula",campoCedula.getText().toString());
+                                                    map.put("nombre",campoNombre.getText().toString());
+                                                    map.put("genero",generoConductor);
+                                                    map.put("edad",campoEdad.getText().toString());
+                                                    map.put("telefono",campotelefono.getText().toString());
+                                                    map.put("estadocivil",EstadoCivil);
+                                                    map.put("residencia",LugarResidencia);
+                                                    map.put("laboral",LugarLaboral);
+                                                    map.put("modelo",campoModelo.getText().toString());
+                                                    map.put("marca",campoMarca.getText().toString());
+                                                    map.put("placa",campoPlaca.getText().toString());
+                                                    map.put("diaslaborales",DiasLaborales2) ;
+                                                    map.put("implementos",campoImplementos.getText().toString()) ;
+                                                    map.put("linkfotoconductor",downloadUriConductor.toString());
+                                                    map.put("linkfotomoto",downloadUriMoto.toString());
+
+                                                    String id = Auth.getCurrentUser().getUid();
+
+                                                    database.child("Conductores").child(id).setValue(map).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                        @Override
+                                                        public void onComplete(@NonNull Task<Void> task2) {
+
+                                                            if(task2.isSuccessful()){
 
 
-                                                    }
+
+                                                                Toast.makeText(getApplicationContext(), "Usuario registrado con exito", Toast.LENGTH_SHORT).show();
+
+                                                                Intent MyIntent = new Intent(getApplicationContext(),MainActivity.class);
+                                                                progressDialog.dismiss();
+                                                                startActivity(MyIntent);
+                                                                finish();
 
 
+                                                            }else{
+
+                                                                Toast.makeText(getApplicationContext(), "Registro fallido", Toast.LENGTH_SHORT).show();
+
+
+                                                            }
+
+
+
+                                                        }
+                                                    });
 
                                                 }
                                             });
 
-                                        }else{
-
-                                            Toast.makeText(getApplicationContext(), "No se pudo registar el usuario", Toast.LENGTH_SHORT).show();
 
                                         }
+                                    });
 
-                                    }
-                                });
+
+
+
+
+
+                                }else{
+
+                                    Auth.createUserWithEmailAndPassword(campoEmail.getText().toString(),campoPassword.getText().toString()).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<AuthResult> task) {
+
+                                            if(task.isSuccessful()){
+
+
+                                                StorageReference folderRefConductor = storageReference.child("fotosConductores");
+                                                StorageReference fotoRefConductor = folderRefConductor.child(new Date().toString());
+
+                                                fotoRefConductor.putFile(pathFotoConductor).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                                    Uri downloadUriConductor;
+                                                    @Override
+                                                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                                        Task<Uri> uriTask =taskSnapshot.getStorage().getDownloadUrl();
+                                                        while(!uriTask.isSuccessful());
+                                                        downloadUriConductor =uriTask.getResult();
+
+
+                                                        //AQUI SE GUARDA LA FOTO DE LA MOTO DEL CONDUCTOR
+
+                                                        StorageReference folderRefMoto = storageReference.child("fotosMotos");
+                                                        StorageReference fotoRefMoto = folderRefMoto.child(new Date().toString());
+
+                                                        fotoRefMoto.putFile(pathFotoMoto).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                                            Uri downloadUriMoto;
+                                                            @Override
+                                                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                                                Task<Uri> uriTask =taskSnapshot.getStorage().getDownloadUrl();
+                                                                while(!uriTask.isSuccessful());
+                                                                downloadUriMoto =uriTask.getResult();
+
+
+                                                                ///AQUI YA SE GUARDA EL CONDCUTOR
+                                                                Map<String,Object> map =new HashMap<>();
+
+                                                                map.put("email",campoEmail.getText().toString());
+                                                                map.put("contrasena",campoPassword.getText().toString());
+                                                                map.put("cedula",campoCedula.getText().toString());
+                                                                map.put("nombre",campoNombre.getText().toString());
+                                                                map.put("genero",generoConductor);
+                                                                map.put("edad",campoEdad.getText().toString());
+                                                                map.put("telefono",campotelefono.getText().toString());
+                                                                map.put("estadocivil",EstadoCivil);
+                                                                map.put("residencia",LugarResidencia);
+                                                                map.put("laboral",LugarLaboral);
+                                                                map.put("modelo",campoModelo.getText().toString());
+                                                                map.put("marca",campoMarca.getText().toString());
+                                                                map.put("placa",campoPlaca.getText().toString());
+                                                                map.put("diaslaborales",DiasLaborales2) ;
+                                                                map.put("implementos",campoImplementos.getText().toString()) ;
+                                                                map.put("linkfotoconductor",downloadUriConductor.toString());
+                                                                map.put("linkfotomoto",downloadUriMoto.toString());
+
+                                                                String id = Auth.getCurrentUser().getUid();
+
+                                                                database.child("Conductores").child(id).setValue(map).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                    @Override
+                                                                    public void onComplete(@NonNull Task<Void> task2) {
+
+                                                                        if(task2.isSuccessful()){
+
+                                                                            Toast.makeText(getApplicationContext(), "Usuario registrado con exito", Toast.LENGTH_SHORT).show();
+
+                                                                            Intent MyIntent = new Intent(getApplicationContext(),MainActivity.class);
+                                                                            progressDialog.dismiss();
+                                                                            startActivity(MyIntent);
+                                                                            finish();
+
+
+                                                                        }else{
+
+                                                                            Toast.makeText(getApplicationContext(), "Registro fallido", Toast.LENGTH_SHORT).show();
+
+
+                                                                        }
+
+
+
+                                                                    }
+                                                                });
+
+
+
+                                                            }
+                                                        });
+
+
+                                                    }
+                                                });
+
+
+
+
+
+
+
+
+
+
+                                            }else{
+
+                                                Toast.makeText(getApplicationContext(), "No se pudo registar el usuario", Toast.LENGTH_SHORT).show();
+
+                                            }
+
+                                        }
+                                    });
+
+
+
+
+
+
+                                }
 
 
                             }
 
-
                         }
-
-                    }
-                });
+                    });
 
 
 
 
 
-            }else{
+                }else{
 
-                Toast.makeText(getApplicationContext(), "La contraseña debe tener al menos 6 caracteres", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "La contraseña debe tener al menos 6 caracteres", Toast.LENGTH_SHORT).show();
+
+                }
 
             }
+
 
 
         }else {
@@ -1132,7 +1708,29 @@ public class RegistroConductorActivity extends AppCompatActivity {
 
 
 
+    private String GuardarFoto(Uri foto) {
 
+        final Uri[] downloadUri = new Uri[1];
+
+
+        StorageReference folderRef = storageReference.child("fotosConductores");
+        StorageReference fotoRef = folderRef.child(new Date().toString());
+
+        fotoRef.putFile(foto).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                Task<Uri> uriTask =taskSnapshot.getStorage().getDownloadUrl();
+                while(!uriTask.isSuccessful());
+                downloadUri[0] =uriTask.getResult();
+
+
+            }
+        });
+
+
+        return downloadUri[0].toString();
+    }
 
 
 

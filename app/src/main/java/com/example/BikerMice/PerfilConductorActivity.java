@@ -26,6 +26,7 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.BikerMice.entidades.Conductor;
 import com.example.BikerMice.utilidades.Utilidades;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -248,6 +249,18 @@ public class PerfilConductorActivity extends AppCompatActivity {
                             nombre[0] =    ds.child("nombre").getValue().toString();
                             NumeroTelefono =ds.child("telefono").getValue().toString();
 
+                            //SE SETEA LAS IMAGENES
+
+                            String LinkFotoConductor = ds.child("linkfotoconductor").getValue().toString();
+                            Glide.with(PerfilConductorActivity.this).load(LinkFotoConductor).into(FotoConductor);
+
+
+                            String LinkFotoMoto = ds.child("linkfotomoto").getValue().toString();
+                            Glide.with(PerfilConductorActivity.this).load(LinkFotoMoto).into(FotoMoto);
+
+
+
+
 
 
 
@@ -300,6 +313,16 @@ public class PerfilConductorActivity extends AppCompatActivity {
                         BarraCalificacion.setVisibility(View.INVISIBLE);
                         MostrarComentario(cedulaComentarios[0]);
                         SetearPuntaje(cedulaComentarios[0]);
+
+
+                        String LinkFotoConductor = snapshot.child("linkfotoconductor").getValue().toString();
+                        String LinkFotoMoto = snapshot.child("linkfotomoto").getValue().toString();
+
+
+
+                        //SE SETEA LAS IMAGENES
+                        Glide.with(PerfilConductorActivity.this).load(LinkFotoConductor).into(FotoConductor);
+                        Glide.with(PerfilConductorActivity.this).load(LinkFotoMoto).into(FotoMoto);
 
                     }
 
@@ -422,6 +445,7 @@ public class PerfilConductorActivity extends AppCompatActivity {
         MiIntent.putExtras(MiBundle);
 
         startActivity(MiIntent);
+        finish();
 
 
 
