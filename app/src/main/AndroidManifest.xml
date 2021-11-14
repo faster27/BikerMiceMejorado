@@ -65,7 +65,7 @@
 
         <activity android:name="com.example.BikerMice.PerfilPasajeroActivity"
             android:screenOrientation="portrait"/>
-        
+
         <activity android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
             android:theme="@style/Base.Theme.AppCompat"/> <!-- optional (needed if default theme has no action bar) -->
 
