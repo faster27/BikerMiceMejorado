@@ -30,6 +30,11 @@
         <activity
             android:name="com.example.BikerMice.InformacionConductorActivity"
             android:exported="true" />
+
+        <activity
+            android:name="com.example.BikerMice.MapsActivity"
+            android:exported="true" />
+
         <activity
             android:name="com.example.BikerMice.ResultadoBusquedaActivity"
             android:exported="true" />
