@@ -785,6 +785,12 @@ public class RegistroConductorActivity extends AppCompatActivity {
 
     }
 
+
+    public void onClickmapSitio2(View view){
+
+        Intent MiIntent = new Intent(getApplicationContext(),MapsActivity2.class);
+        startActivity(MiIntent);
+    }
     private void ActualizarPerfil() {
 
         progressDialog.setTitle("Actualizando...");
