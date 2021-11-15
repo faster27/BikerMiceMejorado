@@ -3,8 +3,6 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
-        <entry key="..\:/Users/KATERIN/OneDrive/Documentos/BikerMiceMejorado/app/src/main/res/layout/activity_maps.xml" value="0.1480978260869565" />
-        <entry key="..\:/Users/KATERIN/OneDrive/Documentos/BikerMiceMejorado/app/src/main/res/layout/activity_maps2.xml" value="0.1480978260869565" />
         <entry key="..\:/Users/KATERIN/OneDrive/Documentos/BikerMiceMejorado/app/src/main/res/layout/perfil_conductor.xml" value="0.16485507246376813" />
         <entry key="..\:/Users/KATERIN/OneDrive/Documentos/BikerMiceMejorado/app/src/main/res/layout/perfil_pasajero.xml" value="0.16485507246376813" />
         <entry key="..\:/Users/KATERIN/OneDrive/Documentos/uni/semestre 9/www/Proyecto 1/ProyectoBikerMice/app/src/main/res/layout/activity_main.xml" value="0.15534420289855072" />
@@ -47,6 +45,7 @@
         <entry key="..\:/Users/dcorr/Desktop/ProyectoBikerMice/ProyectoBikerMice-development/app/src/main/res/layout-land/activity_main.xml" value="0.15961199294532627" />
         <entry key="..\:/Users/dcorr/Desktop/ProyectoBikerMice/ProyectoBikerMice-development/app/src/main/res/layout/activity_informacion_conductor.xml" value="0.15989583333333332" />
         <entry key="..\:/Users/dcorr/Desktop/ProyectoBikerMice/ProyectoBikerMice-development/app/src/main/res/layout/activity_main.xml" value="0.25" />
+        <entry key="..\:/Users/dcorr/Desktop/ProyectoBikerMice/ProyectoBikerMice-development/app/src/main/res/layout/activity_maps2.xml" value="0.1322463768115942" />
         <entry key="..\:/Users/dcorr/Desktop/ProyectoBikerMice/ProyectoBikerMice-development/app/src/main/res/layout/activity_resultado_busqueda.xml" value="0.1375" />
         <entry key="..\:/Users/dcorr/Desktop/ProyectoBikerMice/ProyectoBikerMice-development/app/src/main/res/layout/list_view_item.xml" value="0.14583333333333334" />
         <entry key="..\:/Users/dcorr/Desktop/ProyectoBikerMice/ProyectoBikerMice-development/app/src/main/res/layout/perfil_conductor.xml" value="0.17864583333333334" />

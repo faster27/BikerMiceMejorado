@@ -35,7 +35,11 @@
         -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="@string/google_maps_key" />
+            android:value="AIzaSyCH9U97VD2ZW4VMdXHL091_BPGifm2itq0" />
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyB80u-ODmAdv1KNq9mPz5SSezx3jgPFFj0" />
 
 
 
@@ -44,8 +48,6 @@
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="ca-app-pub-1561986082608677~5789560956"/>
 
-
->>>>>>> 144be1433eabab928f36eb7328cda2c1884c4598
         <activity
             android:name=".MapsActivity2"
             android:exported="false"
