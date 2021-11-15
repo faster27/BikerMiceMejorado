@@ -34,6 +34,19 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
+<<<<<<< HEAD
+=======
+
+
+       >
+
+        <!-- Sample AdMob app ID: ca-app-pub-3940256099942544~3347511713 -->
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-1561986082608677~5789560956"/>
+
+
+>>>>>>> 144be1433eabab928f36eb7328cda2c1884c4598
         <activity
             android:name=".MapsActivity2"
             android:exported="false"
@@ -41,6 +54,11 @@
         <activity
             android:name=".InformacionConductorActivity"
             android:exported="true" />
+
+        <activity
+            android:name="com.example.BikerMice.MapsActivity"
+            android:exported="true" />
+
         <activity
             android:name=".ResultadoBusquedaActivity"
             android:exported="true" />
