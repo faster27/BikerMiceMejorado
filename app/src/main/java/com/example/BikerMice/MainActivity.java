@@ -51,7 +51,6 @@ public class MainActivity extends AppCompatActivity {
 
     private GoogleSignInClient googleSignInCliente;
     private static final int GOOGLE_SIGN_IN=1111;
-    private InterstitialAd mInterstitialAd;
     private AdView mAdView;
 
 
