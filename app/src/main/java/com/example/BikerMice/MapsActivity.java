@@ -1,18 +1,27 @@
 package com.example.BikerMice;
 
+import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.LocaleList;
 
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.example.BikerMice.databinding.ActivityMapsBinding;
 
@@ -20,6 +29,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private GoogleMap mMap;
     private ActivityMapsBinding binding;
+    private Marker marcador;
+    double lat = 0.0;
+    double lng = 0.0;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,30 +51,62 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        mMap.getUiSettings().setZoomControlsEnabled(true);
-        mMap.getUiSettings().setMyLocationButtonEnabled(true);
+        miUbicacion();
 
-        LatLng tulua = new LatLng(4.0856667, -76.1972779);
-        mMap.addMarker(new MarkerOptions().position(tulua).title("Municipio de Tuluá").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
 
-        LatLng Buga = new LatLng(3.9000578, -76.302013);
-        mMap.addMarker(new MarkerOptions().position(Buga).title("Buga").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+    }
 
-        LatLng Andalucia = new LatLng(4.1694199, -76.1670623);
-        mMap.addMarker(new MarkerOptions().position(Andalucia).title("Andalucia - Valle").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA)));
+    private void agregarMarcador(double lat, double lng) {
 
-        LatLng SanPedro = new LatLng(3.9955682, -76.2280495);
-        mMap.addMarker(new MarkerOptions().position(SanPedro).title("San pedro - Valle").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ROSE)));
+        LatLng coordenadas = new LatLng(lat, lng);
+        CameraUpdate miUbicacion = CameraUpdateFactory.newLatLngZoom(coordenadas, 16);
+        if (marcador != null) marcador.remove();
+        marcador = mMap.addMarker(new MarkerOptions()
+                .position(coordenadas)
+                .title("Mi posicion")
+        );
 
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(tulua,10));
+        mMap.animateCamera(miUbicacion);
+
+    }
+
+    private void ActualizarUbicacion(Location location) {
+        if (location != null) {
+
+
+            lat = location.getLatitude();
+            lng = location.getLongitude();
+
+            agregarMarcador(lat, lng);
+        }
+
+
+    }
+
+
+    LocationListener locListener = new LocationListener() {
+        @Override
+        public void onLocationChanged(@NonNull Location location) {
+            ActualizarUbicacion(location);
+        }
+    };
+
+    private void miUbicacion() {
+
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
             return;
         }
+        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
-        mMap.setMyLocationEnabled(true);
-
-
+        Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER );
+        ActualizarUbicacion(location);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,15000,0,locListener);
     }
+
+
+
+
+
 }

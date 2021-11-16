@@ -27,7 +27,7 @@
                 android:layout_marginEnd="64dp"
                 android:layout_marginBottom="4dp"
                 android:clickable="true"
-                android:onClick="onClickmapSitio"
+                android:onClick="onClickmapSitioConductor"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/tituloBienvenida"
                 app:layout_constraintStart_toStartOf="parent"

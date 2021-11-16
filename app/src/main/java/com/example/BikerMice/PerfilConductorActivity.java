@@ -586,4 +586,9 @@ public class PerfilConductorActivity extends AppCompatActivity {
 
 
     }
+
+    public void onClickmapSitioConductor(View view) {
+        Intent MiIntent = new Intent(getApplicationContext(),MapsActivity.class);
+        startActivity(MiIntent);
+    }
 }

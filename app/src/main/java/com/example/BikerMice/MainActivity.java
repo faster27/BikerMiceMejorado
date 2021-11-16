@@ -51,7 +51,6 @@ public class MainActivity extends AppCompatActivity {
 
     private GoogleSignInClient googleSignInCliente;
     private static final int GOOGLE_SIGN_IN=1111;
-    private InterstitialAd mInterstitialAd;
     private AdView mAdView;
 
 
@@ -251,7 +250,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void onClickLogin(View view) {
+    public void onClickLogin(View view) throws Exception {
 
 
        String CorreoUsuario= correo.getText().toString();
