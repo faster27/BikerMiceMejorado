@@ -37,6 +37,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.SignInMethodQueryResult;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -653,6 +654,14 @@ public class RegistroConductorActivity extends AppCompatActivity {
                    String LinkFotoMoto = snapshot.child("linkfotomoto").getValue().toString();
 
 
+                   String contrasenaDes = null;
+                   try {
+                       contrasenaDes = CodificadorAES.desencriptar(contrasena);
+                   } catch (Exception e) {
+                       e.printStackTrace();
+                   }
+
+                  
 
                    //SE SETEA LAS IMAGENES
                    Glide.with(RegistroConductorActivity.this).load(LinkFotoConductor).into(imagenConductor);
@@ -663,7 +672,8 @@ public class RegistroConductorActivity extends AppCompatActivity {
                    campoEmail.setKeyListener(null);
 
                    //SE SETEA EL CAMPO CONTRASEÑA
-                   campoPassword.setText(contrasena);
+                  
+                   campoPassword.setText(contrasenaDes);
 
 
                    //SE SETEA EL CAMPO CEDULA
@@ -785,12 +795,7 @@ public class RegistroConductorActivity extends AppCompatActivity {
 
     }
 
-
-    public void onClickmapSitio2(View view){
-
-        Intent MiIntent = new Intent(getApplicationContext(),MapsActivity2.class);
-        startActivity(MiIntent);
-    }
+    
     private void ActualizarPerfil() {
 
         progressDialog.setTitle("Actualizando...");
@@ -826,11 +831,22 @@ public class RegistroConductorActivity extends AppCompatActivity {
 
               if(pathFotoConductor==null && pathFotoMoto==null){
 
+
+                  String contraseña = null;
+                  try {
+                      contraseña= CodificadorAES.encriptar(campoPassword.getText().toString());
+                  } catch (Exception e) {
+                      e.printStackTrace();
+                  }
+
+
+                  String finalContrasena = contraseña;
+
                   Map<String,Object> map =new HashMap<>();
 
                   map.put("email",campoEmail.getText().toString());
                   map.put("cedula",campoCedula.getText().toString());
-                  map.put("contrasena",campoPassword.getText().toString());
+                  map.put("contrasena",finalContrasena);
                   map.put("nombre",campoNombre.getText().toString());
                   map.put("genero",generoConductor);
                   map.put("edad",campoEdad.getText().toString());
@@ -847,6 +863,10 @@ public class RegistroConductorActivity extends AppCompatActivity {
                   database.child("Conductores").child(Auth.getCurrentUser().getUid().toString()).updateChildren(map).addOnSuccessListener(new OnSuccessListener<Void>() {
                       @Override
                       public void onSuccess(Void unused) {
+
+                          FirebaseUser user = Auth.getInstance().getCurrentUser();
+
+                          user.updatePassword(campoPassword.getText().toString());
 
                           Toast.makeText(getApplicationContext(), "Usuario Actualizado con exito", Toast.LENGTH_SHORT).show();
 
@@ -871,6 +891,10 @@ public class RegistroConductorActivity extends AppCompatActivity {
 
                       }
                   });
+
+
+
+
 
 
 
@@ -934,7 +958,15 @@ public class RegistroConductorActivity extends AppCompatActivity {
                                       }
                                   });
 
+                                  String contraseña = null;
+                                  try {
+                                      contraseña= CodificadorAES.encriptar(campoPassword.getText().toString());
+                                  } catch (Exception e) {
+                                      e.printStackTrace();
+                                  }
 
+
+                                  String finalContrasena = contraseña;
 
                                   //AHORA SE GUARDA LA NUEVA FOTO EN EL STORAGE
 
@@ -946,11 +978,15 @@ public class RegistroConductorActivity extends AppCompatActivity {
                                           while(!uriTask.isSuccessful());
                                           downloadUriMoto=uriTask.getResult();
 
+                                          FirebaseUser user = Auth.getInstance().getCurrentUser();
+
+                                          user.updatePassword(campoPassword.getText().toString());
+
                                           Map<String,Object> map =new HashMap<>();
 
                                           map.put("email",campoEmail.getText().toString());
                                           map.put("cedula",campoCedula.getText().toString());
-                                          map.put("contrasena",campoPassword.getText().toString());
+                                          map.put("contrasena",finalContrasena);
                                           map.put("nombre",campoNombre.getText().toString());
                                           map.put("genero",generoConductor);
                                           map.put("edad",campoEdad.getText().toString());
@@ -1004,12 +1040,26 @@ public class RegistroConductorActivity extends AppCompatActivity {
                                           while (!uriTask1.isSuccessful());
                                           downloadUriConductor=uriTask1.getResult();
 
+                                          FirebaseUser user = Auth.getInstance().getCurrentUser();
+
+                                          user.updatePassword(campoPassword.getText().toString());
+
+
+                                          String contraseña = null;
+                                          try {
+                                              contraseña= CodificadorAES.encriptar(campoPassword.getText().toString());
+                                          } catch (Exception e) {
+                                              e.printStackTrace();
+                                          }
+
+
+                                          String finalContrasena = contraseña;
 
                                           Map<String,Object> map =new HashMap<>();
 
                                           map.put("email",campoEmail.getText().toString());
                                           map.put("cedula",campoCedula.getText().toString());
-                                          map.put("contrasena",campoPassword.getText().toString());
+                                          map.put("contrasena",finalContrasena);
                                           map.put("nombre",campoNombre.getText().toString());
                                           map.put("genero",generoConductor);
                                           map.put("edad",campoEdad.getText().toString());
@@ -1120,6 +1170,16 @@ public class RegistroConductorActivity extends AppCompatActivity {
 
                       //AHORA SE GUARDA LA NUEVA FOTO EN EL STORAGE
 
+                      String contraseña = null;
+                      try {
+                          contraseña= CodificadorAES.encriptar(campoPassword.getText().toString());
+                      } catch (Exception e) {
+                          e.printStackTrace();
+                      }
+
+
+                      String finalContrasena = contraseña;
+
                       fotoRefMotos.putFile(pathFotoMoto).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                           Uri downloadUri;
                           @Override
@@ -1128,11 +1188,15 @@ public class RegistroConductorActivity extends AppCompatActivity {
                               while(!uriTask.isSuccessful());
                               downloadUri=uriTask.getResult();
 
+                              FirebaseUser user = Auth.getInstance().getCurrentUser();
+
+                              user.updatePassword(campoPassword.getText().toString());
+
                               Map<String,Object> map =new HashMap<>();
 
                               map.put("email",campoEmail.getText().toString());
                               map.put("cedula",campoCedula.getText().toString());
-                              map.put("contrasena",campoPassword.getText().toString());
+                              map.put("contrasena",finalContrasena);
                               map.put("nombre",campoNombre.getText().toString());
                               map.put("genero",generoConductor);
                               map.put("edad",campoEdad.getText().toString());
@@ -1253,11 +1317,25 @@ public class RegistroConductorActivity extends AppCompatActivity {
                               while(!uriTask.isSuccessful());
                               downloadUri=uriTask.getResult();
 
+                              FirebaseUser user = Auth.getInstance().getCurrentUser();
+
+                              user.updatePassword(campoPassword.getText().toString());
+
+                              String contraseña = null;
+                              try {
+                                  contraseña= CodificadorAES.encriptar(campoPassword.getText().toString());
+                              } catch (Exception e) {
+                                  e.printStackTrace();
+                              }
+
+
+                              String finalContrasena = contraseña;
+
                               Map<String,Object> map =new HashMap<>();
 
                               map.put("email",campoEmail.getText().toString());
                               map.put("cedula",campoCedula.getText().toString());
-                              map.put("contrasena",campoPassword.getText().toString());
+                              map.put("contrasena",finalContrasena);
                               map.put("nombre",campoNombre.getText().toString());
                               map.put("genero",generoConductor);
                               map.put("edad",campoEdad.getText().toString());
@@ -1454,6 +1532,16 @@ public class RegistroConductorActivity extends AppCompatActivity {
 
                 if(campoPassword.getText().toString().length()>=6) {
 
+                    String contraseña = null;
+                    try {
+                        contraseña= CodificadorAES.encriptar(campoPassword.getText().toString());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+
+                    String finalContrasena = contraseña;
+
 
                     FirebaseAuth.getInstance().fetchSignInMethodsForEmail(campoEmail.getText().toString()).addOnCompleteListener(new OnCompleteListener<SignInMethodQueryResult>() {
                         @Override
@@ -1502,7 +1590,7 @@ public class RegistroConductorActivity extends AppCompatActivity {
                                                     Map<String,Object> map =new HashMap<>();
 
                                                     map.put("email",campoEmail.getText().toString());
-                                                    map.put("contrasena",campoPassword.getText().toString());
+                                                    map.put("contrasena",finalContrasena);
                                                     map.put("cedula",campoCedula.getText().toString());
                                                     map.put("nombre",campoNombre.getText().toString());
                                                     map.put("genero",generoConductor);
@@ -1563,6 +1651,17 @@ public class RegistroConductorActivity extends AppCompatActivity {
 
                                 }else{
 
+                                    String contraseña = null;
+                                    try {
+                                        contraseña= CodificadorAES.encriptar(campoPassword.getText().toString());
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+
+
+                                    String finalContrasena = contraseña;
+
+
                                     Auth.createUserWithEmailAndPassword(campoEmail.getText().toString(),campoPassword.getText().toString()).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                                         @Override
                                         public void onComplete(@NonNull Task<AuthResult> task) {
@@ -1600,7 +1699,7 @@ public class RegistroConductorActivity extends AppCompatActivity {
                                                                 Map<String,Object> map =new HashMap<>();
 
                                                                 map.put("email",campoEmail.getText().toString());
-                                                                map.put("contrasena",campoPassword.getText().toString());
+                                                                map.put("contrasena",finalContrasena);
                                                                 map.put("cedula",campoCedula.getText().toString());
                                                                 map.put("nombre",campoNombre.getText().toString());
                                                                 map.put("genero",generoConductor);

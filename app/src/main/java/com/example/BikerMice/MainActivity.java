@@ -250,7 +250,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void onClickLogin(View view) {
+    public void onClickLogin(View view) throws Exception {
 
 
        String CorreoUsuario= correo.getText().toString();

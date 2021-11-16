@@ -39,6 +39,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.auth.SignInMethodQueryResult;
 import com.google.firebase.database.DataSnapshot;
@@ -175,13 +176,21 @@ public class RegistroPasajerosActivity extends AppCompatActivity {
                     String LinkFoto = snapshot.child("linkfoto").getValue().toString();
                     Glide.with(RegistroPasajerosActivity.this).load(LinkFoto).into(ImagenPasajero);
 
+                    String contraseñaDes = null;
+
+                    try {
+                        contraseñaDes=CodificadorAES.desencriptar(contrasena);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
 
                     //SE SETEA EL CAMPO EMAIL
                     campoEmail.setText(email);
                     campoEmail.setKeyListener(null);
 
                     //SE SETEA EL CAMPO CONTRASEÑA
-                    campoPassword.setText(contrasena);
+                    campoPassword.setText(contraseñaDes);
 
 
                     //SE SETEA EL CAMPO CEDULA
@@ -301,12 +310,23 @@ public class RegistroPasajerosActivity extends AppCompatActivity {
 
             if(campoPassword.getText().toString().length()>=6){
 
+
                 if(path ==null){
+
+                    String contraseña = null;
+                    try {
+                        contraseña= CodificadorAES.encriptar(campoPassword.getText().toString());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+
+                    String finalContrasena = contraseña;
 
                     Map<String,Object> UsuarioMap = new HashMap<>();
 
                     UsuarioMap.put("email",campoEmail.getText().toString());
-                    UsuarioMap.put("contrasena",campoPassword.getText().toString());
+                    UsuarioMap.put("contrasena",finalContrasena);
                     UsuarioMap.put("nombre",campoNombre.getText().toString());
                     UsuarioMap.put("cedula",campoCedula.getText().toString());
                     UsuarioMap.put("genero",GeneroPasajero);
@@ -315,6 +335,10 @@ public class RegistroPasajerosActivity extends AppCompatActivity {
                     database.child("Users").child(Auth.getCurrentUser().getUid().toString()).updateChildren(UsuarioMap).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void unused) {
+
+                            FirebaseUser user = Auth.getInstance().getCurrentUser();
+
+                            user.updatePassword(campoPassword.getText().toString());
 
                             Toast.makeText(getApplicationContext(), "Usuario Actualizado con exito", Toast.LENGTH_SHORT).show();
 
@@ -345,6 +369,18 @@ public class RegistroPasajerosActivity extends AppCompatActivity {
 
 
                 else{
+
+                    String contraseña = null;
+                    try {
+                        contraseña= CodificadorAES.encriptar(campoPassword.getText().toString());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+
+                    String finalContrasena = contraseña;
+
+
 
 
                     StorageReference folderRef = storageReference.child("fotosPasajeros");
@@ -388,6 +424,8 @@ public class RegistroPasajerosActivity extends AppCompatActivity {
 
 
 
+
+
                     fotoRef.putFile(path).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                         Uri downloadUri;
                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
@@ -398,7 +436,7 @@ public class RegistroPasajerosActivity extends AppCompatActivity {
                             Map<String,Object> UsuarioMap = new HashMap<>();
 
                             UsuarioMap.put("email",campoEmail.getText().toString());
-                            UsuarioMap.put("contrasena",campoPassword.getText().toString());
+                            UsuarioMap.put("contrasena",finalContrasena);
                             UsuarioMap.put("nombre",campoNombre.getText().toString());
                             UsuarioMap.put("cedula",campoCedula.getText().toString());
                             UsuarioMap.put("genero",GeneroPasajero);
@@ -408,6 +446,10 @@ public class RegistroPasajerosActivity extends AppCompatActivity {
                             database.child("Users").child(Auth.getCurrentUser().getUid().toString()).updateChildren(UsuarioMap).addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void unused) {
+
+                                    FirebaseUser user = Auth.getInstance().getCurrentUser();
+
+                                    user.updatePassword(campoPassword.getText().toString());
 
                                     Toast.makeText(getApplicationContext(), "Usuario Actualizado con exito", Toast.LENGTH_SHORT).show();
 
@@ -492,7 +534,15 @@ public class RegistroPasajerosActivity extends AppCompatActivity {
 
             if(campoPassword.getText().toString().length()>=6){
 
+                String contraseña = null;
+                try {
+                    contraseña= CodificadorAES.encriptar(campoPassword.getText().toString());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
 
+
+                String finalContrasena = contraseña;
 
 
                 ///AQUI YA SE GUARDA EL PASAJERO Y SE LE PASA EL LINK DE LA FOTO
@@ -525,7 +575,7 @@ public class RegistroPasajerosActivity extends AppCompatActivity {
                                         Map<String,Object> map =new HashMap<>();
 
                                         map.put("email",campoEmail.getText().toString());
-                                        map.put("contrasena",campoPassword.getText().toString());
+                                        map.put("contrasena",finalContrasena);
                                         map.put("nombre",campoNombre.getText().toString());
                                         map.put("cedula",campoCedula.getText().toString());
                                         map.put("edad",campoEdad.getText().toString());
@@ -571,7 +621,16 @@ public class RegistroPasajerosActivity extends AppCompatActivity {
                             else{
 
 
-                                        Auth.createUserWithEmailAndPassword(campoEmail.getText().toString(),campoPassword.getText().toString()).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                                String contraseña = null;
+                                try {
+                                    contraseña= CodificadorAES.encriptar(campoPassword.getText().toString());
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+
+
+                                String finalContrasena = contraseña;
+                                Auth.createUserWithEmailAndPassword(campoEmail.getText().toString(),campoPassword.getText().toString()).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                                             @Override
                                             public void onComplete(@NonNull Task<AuthResult> task) {
 
@@ -591,7 +650,7 @@ public class RegistroPasajerosActivity extends AppCompatActivity {
                                                             Map<String,Object> map =new HashMap<>();
 
                                                             map.put("email",campoEmail.getText().toString());
-                                                            map.put("contrasena",campoPassword.getText().toString());
+                                                            map.put("contrasena", finalContrasena);
                                                             map.put("nombre",campoNombre.getText().toString());
                                                             map.put("cedula",campoCedula.getText().toString());
                                                             map.put("edad",campoEdad.getText().toString());
