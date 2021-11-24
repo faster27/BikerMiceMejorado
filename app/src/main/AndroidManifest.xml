@@ -48,18 +48,23 @@
         <activity
             android:name=".MapsActivity2"
             android:exported="false"
-            android:label="@string/title_activity_maps2" />
+            android:label="@string/title_activity_maps2"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".InformacionConductorActivity"
-            android:exported="true" />
+            android:exported="true"
+            android:screenOrientation="portrait"/>
 
         <activity
             android:name="com.example.BikerMice.MapsActivity"
-            android:exported="true" />
+            android:exported="true"
+            android:screenOrientation="portrait"/>
 
         <activity
             android:name=".ResultadoBusquedaActivity"
-            android:exported="true" />
+            android:exported="true"
+            android:screenOrientation="portrait"/>
+
         <activity
             android:name=".SplashActivity"
             android:exported="true">
@@ -71,12 +76,19 @@
         </activity>
         <activity
             android:name=".MainActivity"
-            android:exported="true" />
-        <activity android:name=".SeleccionRegistroActivity" />
-        <activity android:name=".RegistroPasajerosActivity" />
-        <activity android:name=".RegistroConductorActivity" />
-        <activity android:name=".PerfilConductorActivity" />
-        <activity android:name=".PerfilPasajeroActivity" />
+            android:exported="true"
+            android:screenOrientation="portrait"/>
+
+        <activity android:name=".SeleccionRegistroActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".RegistroPasajerosActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".RegistroConductorActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".PerfilConductorActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".PerfilPasajeroActivity"
+            android:screenOrientation="portrait"/>
         <activity
             android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
             android:theme="@style/Base.Theme.AppCompat" />
